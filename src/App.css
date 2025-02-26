@@ -1,0 +1,14 @@
+/* heor section img */
+@media (max-width: 640px) {
+    .mobile-device-hero-img {
+        height: 300px !important;
+    }
+}
+
+html{
+    scroll-behavior: smooth !important;
+}
+
+body{
+    background-color: whitesmoke !important;
+}
