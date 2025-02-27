@@ -10,6 +10,7 @@ import Hr_Login from "./Components/UNAUTHENTICATION/Hr_Login/Hr_Login";
 import Contact from "./Components/UNAUTHENTICATION/Contact/Contact";
 import Password_Reset from "./Components/UNAUTHENTICATION/Password_Reset/Password_Reset";
 import Reset_Password from "./Components/UNAUTHENTICATION/Reset_Password/Reset_Password";
+import Auth_Home from "./Components/AUTHENTICATION/Auth_Home/Auth_Home";
 
 const App = () => {
 
@@ -25,6 +26,7 @@ const App = () => {
           <Route path='/hr_login' element={<Hr_Login />}></Route>
           <Route path='/password_reset' element={<Password_Reset />}></Route>
           <Route path='/reset_password' element={<Reset_Password />}></Route>
+          <Route path='/auth_home' element={<Auth_Home />}></Route>
         </Routes>
         <Footer />
       </BrowserRouter>

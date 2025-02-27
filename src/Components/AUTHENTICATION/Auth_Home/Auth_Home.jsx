@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 
-const Home = () => {
+const Auth_Home = () => {
     // Slide Section Data/
     const slides = [
         { id: 'slide1', src: './image/demp.png', alt: 'slide-img-1', next: 'slide2', prev: 'slide3' },
@@ -34,6 +34,37 @@ const Home = () => {
                 console.error("Error fetching data:", error);
 
             });
+    }, []);
+    // flower filter 
+    const [selectedFilter, setSelectedFilter] = useState("all");
+    const [filteredFlowers, setFilteredFlowers] = useState([]);
+
+    const filters = [
+        "All", "Calla Lilies", "Carnations", "Daisies", "Gardenias",
+        "Delphiniums", "Zinnias", "Alstroemeria", "Buttercups", "Queen Anne’s"
+    ];
+
+    // পেজ লোড হলে সব ফুল দেখাবে
+    useEffect(() => {
+        setFilteredFlowers(flowers);
+    }, [flowers]);
+
+    const handleFilterClick = (filter) => {
+        setSelectedFilter(filter.toLowerCase());
+        if (filter === "All") {
+            setFilteredFlowers(flowers);
+        } else {
+            setFilteredFlowers(flowers.filter(flower => flower.category.toLowerCase() === filter.toLowerCase()));
+        }
+    };
+    // flower care tips
+    const [careTips, setCareTips] = useState([]);
+
+    useEffect(() => {
+        fetch("https://flower-seal-backend.vercel.app/api/v1/flower/care_tips/")
+            .then(res => res.json())
+            .then(data => setCareTips(data))
+            .catch(err => console.error("Error fetching care tips:", err));
     }, []);
     return (
         <>
@@ -110,20 +141,73 @@ const Home = () => {
                         </div>
                     </div>
                 </section>
+                {/* flower care tips */}
+                <section>
+                    <div className="max-w-screen-xl mx-auto py-3">
+                        <h2 className="text-center text-3xl font-bold">Flower Care Tips</h2>
+                        <p className="text-center text-gray-700 mb-8">Learn how to take care of your flowers with expert tips.</p>
+
+                        <div style={{ lineHeight: '30px' }}>
+                            {careTips.map((tip) => (
+                                <div key={tip.id} className="bg-white shadow-lg rounded-lg p-6 border border-gray-200">
+                                    <h3 className="text-xl font-semibold text-primary">🌿 {tip.plant_name}</h3>
+                                    <p><strong>Symptoms:</strong> {tip.symptoms}</p>
+                                    <p><strong>Revival Steps:</strong> {tip.revival_steps}</p>
+                                    <p><strong>Recommended Fertilizer:</strong> {tip.recommended_fertilizer}</p>
+                                    <p><strong>Watering Caution:</strong> {tip.watering_caution}</p>
+                                    <p><strong>Sunlight Adjustment:</strong> {tip.sunlight_adjustment}</p>
+                                    <p><strong>Sunlight Needs:</strong> {tip.sunlight_needs}</p>
+                                    <p><strong>Recommended Water Frequency:</strong> {tip.recommended_water_frequency}</p>
+                                    <p><strong>Created At:</strong> {new Date(tip.created_at).toLocaleDateString()}</p>
+                                    <p><strong>Updated At:</strong> {new Date(tip.updated_at).toLocaleDateString()}</p>
+                                    <p className="text-gray-700 italic"><strong>Special Notes:</strong> {tip.special_notes || "No special notes"}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
                 {/* our flower */}
                 <section>
-                    <h1 className="text-3xl mt-6 text-center font-bold">Our Flower</h1>
+                    <h1 className="text-3xl text-center font-bold">Our Flower</h1>
+                    {/* flower category show */}
+                    <div className="container pt-3">
+                        <div className="bg-white text-black rounded-2xl shadow-lg p-6">
+                            <h3 className="text-center text-xl font-bold mb-4">Flower Filter</h3>
+                            <ul className="flex flex-wrap justify-center gap-2 md:gap-4 px-3 md:px-5 py-4">
+                                {filters.map((filter) => (
+                                    <li key={filter}
+                                        className={`px-4 py-2 rounded-md font-bold cursor-pointer transition-all duration-300 ${selectedFilter === filter.toLowerCase() ? 'bg-gradient-to-r from-blue-400 to-purple-400 text-white' : 'bg-gray-200 text-black'}`}
+                                        onClick={() => handleFilterClick(filter)}>
+                                        {filter}
+                                    </li>
+                                ))}
+                            </ul>
+                            <div className="text-center mt-3">
+                                <strong className="text-black">Total Flowers : {filteredFlowers.length}</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* flower items show */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 mt-6 lg:grid-cols-3 gap-8">
-                        {flowers.map((flower) => (
-                            <div key={flower.id} className="card bg-white shadow-md rounded-lg overflow-hidden">
+                        {filteredFlowers.map((flower) => (
+                            <div key={flower.id} className="bg-white shadow-md rounded-lg overflow-hidden">
                                 <figure>
                                     <img src={flower.image} alt={flower.title} className="w-full h-52 object-cover" />
                                 </figure>
                                 <div className="p-4">
                                     <h3 className="text-lg font-semibold">{flower.title}</h3>
-                                    <p className="text-gray-600 text-sm mt-2 line-clamp-2">{flower.description.slice(0,40)}.....</p>
+                                    <p className="text-gray-600 text-sm mt-2 line-clamp-2">{flower.description.slice(0, 40)}</p>
                                     <p className="text-lg font-semibold line-clamp-2 mt-2 text-primary"><b>৳</b>{flower.price}</p>
                                     <p className="text-lg font-semibold mt-2 btn w-40">{flower.category}</p>
+                                    <div className="flex gap-5 mt-5">
+                                        <div>
+                                            <button className="btn btn-accent">Details</button>
+                                        </div>
+                                        <div>
+                                            <button className="btn btn-primary">Add To Cart</button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         ))}
@@ -134,4 +218,4 @@ const Home = () => {
     );
 };
 
-export default Home;
+export default Auth_Home;
