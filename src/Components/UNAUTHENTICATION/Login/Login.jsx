@@ -1,18 +1,61 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
+import { toast } from "react-hot-toast";
+import { Link, useNavigate } from "react-router-dom";
 
 const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
+    const [formData, setFormData] = useState({ username: "", password: "" });
+    const [error, setError] = useState("");
+    const navigate = useNavigate();
 
     const togglePassword = () => {
         setShowPassword(!showPassword);
     };
 
-    const handleLogin = (event) => {
-        event.preventDefault();
-        console.log("Login Form Submitted");
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
     };
+
+    const handleLogin = async (event) => {
+        event.preventDefault();
+        setError("");
+
+        try {
+            const response = await fetch("https://flower-seal-backend.vercel.app/api/v1/user/login/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(formData),
+            });
+
+            const data = await response.json();
+            console.log("API Response:", data); 
+
+            if (response.ok) {
+                if (data.user && data.user.id) {
+                    localStorage.setItem("auth_token", data.token);
+                    localStorage.setItem("userId", data.user.id);
+                    localStorage.setItem("UserName", data.user.username);
+                    console.log("User ID Stored:", localStorage.getItem("userId"));
+                    console.log("User UserName Stored:", localStorage.getItem("UserName"));
+                } else {
+                    console.error("User ID missing in response!");
+                }
+
+                window.dispatchEvent(new Event("storage"));
+                toast.success("Login Successfully!");
+                navigate(`/profile/${data.user.username}`); 
+            } else {
+                toast.error(data.detail || "Login failed. Please try again.");
+            }
+        } catch (error) {
+            toast.error(error.message || "Failed To Login. Please Try Again");
+        }
+    };
+
+
 
     return (
         <>
@@ -27,18 +70,22 @@ const Login = () => {
                     {/* Right Side Form */}
                     <div className="w-full md:w-1/2 bg-white p-8 rounded-2xl shadow-lg">
                         <form onSubmit={handleLogin} id="login-form" className="space-y-4">
+                            {error && <p className="text-red-500 text-center">{error}</p>}
+
                             <div>
                                 <label htmlFor="username" className="font-bold block">Username</label>
-                                <input type="text" id="username" name="username" placeholder="Please Enter Your Username" required
-                                    className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" />
+                                <input type="text" id="username" name="username" value={formData.username}
+                                    onChange={handleChange} placeholder="Enter Your Username" required
+                                    className="input input-bordered w-full" />
                             </div>
 
                             <div>
                                 <label htmlFor="password" className="font-bold block">Password</label>
                                 <div className="relative">
                                     <input type={showPassword ? "text" : "password"} id="password" name="password"
-                                        placeholder="Please Enter Your Password" required
-                                        className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 pr-10" />
+                                        value={formData.password} onChange={handleChange}
+                                        placeholder="Enter Your Password" required
+                                        className="input input-bordered w-full" />
                                     <span className="absolute right-3 top-3 cursor-pointer text-gray-600" onClick={togglePassword}>
                                         {showPassword ? "👁️" : "🙈"}
                                     </span>
