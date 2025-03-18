@@ -1,14 +1,9 @@
-/* heor section img */
-@media (max-width: 640px) {
-    .mobile-device-hero-img {
-        height: 300px !important;
-    }
-}
-
-html{
+html {
     scroll-behavior: smooth !important;
 }
 
 body{
-    background-color: whitesmoke !important;
+    font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    background-color: whitesmoke;
+    color: #111;
 }

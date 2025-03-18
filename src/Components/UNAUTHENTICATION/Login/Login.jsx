@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { toast } from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
+import { baseUrl } from "../../../constants/env.constants";
 
 const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
@@ -22,7 +23,7 @@ const Login = () => {
         setError("");
 
         try {
-            const response = await fetch("https://flower-seal-backend.vercel.app/api/v1/user/login/", {
+            const response = await fetch(`${baseUrl}/user/login`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -31,7 +32,7 @@ const Login = () => {
             });
 
             const data = await response.json();
-            console.log("API Response:", data); 
+            console.log("API Response:", data);
 
             if (response.ok) {
                 if (data.user && data.user.id) {
@@ -46,7 +47,7 @@ const Login = () => {
 
                 window.dispatchEvent(new Event("storage"));
                 toast.success("Login Successfully!");
-                navigate(`/profile/${data.user.username}`); 
+                navigate(`/profile/${data.user.username}`);
             } else {
                 toast.error(data.detail || "Login failed. Please try again.");
             }
@@ -59,8 +60,8 @@ const Login = () => {
 
     return (
         <>
-            <Helmet><title>Login</title></Helmet>
             <section>
+                <Helmet><title>Login</title></Helmet>
                 <div className="container max-w-screen-xl mx-auto px-6 py-3 flex flex-col md:flex-row items-center justify-between gap-10 pt-28">
                     {/* Left Side Image */}
                     <div className="w-full md:w-1/2">
@@ -90,7 +91,7 @@ const Login = () => {
                                         {showPassword ? "👁️" : "🙈"}
                                     </span>
                                 </div>
-                            </div>
+                            </div>  
 
                             <div>
                                 <button type="submit" className="w-full bg-gradient-to-r from-green-500 to-teal-500 text-white py-2 rounded-md font-bold">

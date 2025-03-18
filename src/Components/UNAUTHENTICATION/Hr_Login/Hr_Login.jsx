@@ -1,17 +1,24 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import { baseUrl } from "../../../constants/env.constants";
 
-const Login = () => {
-    // Set default values for username and password
-    const [formData, setFormData] = useState({ username: "flowersealadmin", password: "flowersealadmin" });
+const Hr_Login = () => {
+    const [showPassword] = useState(false);
+    const [formData, setFormData] = useState({ username: "", password: "" });
     const [error, setError] = useState("");
     const navigate = useNavigate();
 
-    const handleInputChange = (event) => {
-        const { name, value } = event.target;
-        setFormData({ ...formData, [name]: value });
+    useEffect(() => {
+        setFormData({
+            username: "flowersealadmin",   
+            password: "flowersealadmin"    
+        });
+    }, []);
+
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
     const handleLogin = async (event) => {
@@ -19,7 +26,7 @@ const Login = () => {
         setError("");
 
         try {
-            const response = await fetch("https://flower-seal-backend.vercel.app/api/v1/user/login/", {
+            const response = await fetch(`${baseUrl}/user/login`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -28,13 +35,24 @@ const Login = () => {
             });
 
             const data = await response.json();
+            console.log("API Response:", data);
 
             if (response.ok) {
-                localStorage.setItem("auth_token", data.token);
-                toast.success(`Login Successfully!`);
-                navigate("/auth_home");
+                if (data.user && data.user.id) {
+                    localStorage.setItem("auth_token", data.token);
+                    localStorage.setItem("userId", data.user.id);
+                    localStorage.setItem("UserName", data.user.username);
+                    console.log("User ID Stored:", localStorage.getItem("userId"));
+                    console.log("User UserName Stored:", localStorage.getItem("UserName"));
+                } else {
+                    console.error("User ID missing in response!");
+                }
+
+                window.dispatchEvent(new Event("storage"));
+                toast.success("Login Successfully!");
+                navigate(`/profile/${data.user.username}`);
             } else {
-                setError(data.detail || "Login failed. Please try again.");
+                toast.error(data.detail || "Login failed. Please try again.");
             }
         } catch (error) {
             toast.error(error.message || "Failed To Login. Please Try Again");
@@ -43,8 +61,8 @@ const Login = () => {
 
     return (
         <>
-            <Helmet><title>Hr Login</title></Helmet>
             <section>
+                <Helmet><title>Login</title></Helmet>
                 <div className="container max-w-screen-xl mx-auto px-6 py-3 flex flex-col md:flex-row items-center justify-between gap-10 pt-28">
                     {/* Left Side Image */}
                     <div className="w-full md:w-1/2">
@@ -58,32 +76,37 @@ const Login = () => {
 
                             <div>
                                 <label htmlFor="username" className="font-bold block">Username</label>
-                                <input 
-                                    id="username" 
-                                    name="username" 
+                                <input
+                                    type="text"
+                                    id="username"
+                                    name="username"
                                     value={formData.username}
-                                    onChange={handleInputChange}
-                                    className="input input-bordered w-full" 
+                                    onChange={handleChange}
+                                    placeholder="Enter Your Username"
+                                    required
+                                    className="input input-bordered w-full"
                                 />
                             </div>
 
                             <div>
                                 <label htmlFor="password" className="font-bold block">Password</label>
                                 <div className="relative">
-                                    <input 
-                                        id="password" 
+                                    <input
+                                        type={showPassword ? "text" : "password"}
+                                        id="password"
                                         name="password"
-                                        type="password"
                                         value={formData.password}
-                                        onChange={handleInputChange}
-                                        className="input input-bordered w-full" 
+                                        onChange={handleChange}
+                                        placeholder="Enter Your Password"
+                                        required
+                                        className="input input-bordered w-full"
                                     />
                                 </div>
                             </div>
 
                             <div>
                                 <button type="submit" className="w-full bg-gradient-to-r from-green-500 to-teal-500 text-white py-2 rounded-md font-bold">
-                                    Login
+                                    Hr Login
                                 </button>
                             </div>
                         </form>
@@ -94,4 +117,4 @@ const Login = () => {
     );
 };
 
-export default Login;
+export default Hr_Login;

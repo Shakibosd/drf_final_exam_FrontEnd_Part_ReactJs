@@ -32,33 +32,34 @@ const Footer = () => {
             </div>
 
             {/* Social Media Section */}
-            <div className="flex flex-wrap justify-center gap-4 md:gap-6 mt-6 text-xl">
-                <a href="https://x.com/syed_shaki27278" target="_blank" className="text-blue-500 hover:text-blue-700">
-                    <FaTwitter size={25} />
+            <div className="flex justify-center items-center gap-5 mt-5">
+                <a href="https://x.com/syed_shaki27278" target="_blank" className="text-blue-500 hover:text-blue-700 flex items-center justify-center">
+                    <FaTwitter size={40} />
+
                 </a>
-                <a href="https://www.youtube.com/@syednazmusshakib1833" target="_blank" className="text-red-500 hover:text-red-700">
-                    <FaYoutube size={25} />
+                <a href="https://www.youtube.com/@syednazmusshakib1833" target="_blank" className="text-red-500 hover:text-red-700 flex items-center justify-center">
+                    <FaYoutube size={40} />
                 </a>
-                <a href="https://www.facebook.com/syednazmusshakib.shakib" target="_blank" className="text-blue-700 hover:text-blue-900">
-                    <FaFacebook size={25} />
+                <a href="https://www.facebook.com/syednazmusshakib.shakib" target="_blank" className="text-blue-700 hover:text-blue-900 flex items-center justify-center">
+                    <FaFacebook size={40} />
                 </a>
-                <a href="https://github.com/Shakibosd" target="_blank" className="text-gray-800 hover:text-gray-600">
-                    <FaGithub size={25} />
+                <a href="https://github.com/Shakibosd" target="_blank" className="text-gray-800 hover:text-gray-600 flex items-center justify-center">
+                    <FaGithub size={40} />
                 </a>
-                <a href="https://www.instagram.com/shakibosd/" target="_blank" className="text-pink-600 hover:text-pink-800">
-                    <FaInstagram size={25} />
+                <a href="https://www.instagram.com/shakibosd/" target="_blank" className="text-pink-600 hover:text-pink-800 flex items-center justify-center">
+                    <FaInstagram size={40} />
                 </a>
-                <a href="https://www.linkedin.com/in/syed-nazmus-shakib-686985264/" target="_blank" className="text-blue-600 hover:text-blue-800">
-                    <FaLinkedin size={25} />
+                <a href="https://www.linkedin.com/in/syed-nazmus-shakib-686985264/" target="_blank" className="text-blue-600 hover:text-blue-800 flex items-center justify-center">
+                    <FaLinkedin size={40} />
                 </a>
             </div>
 
             {/* Copyright Section */}
-            <aside className="mt-6 text-sm md:text-base">
+            <aside className="mt-6 text-sm">
                 <p>
                     Copyright © {new Date().getFullYear()} - Develop With By{" "}
                     <b>
-                        <a href="https://nazmus-shakib.netlify.app/" target="_blank" rel="noopener noreferrer">
+                        <a href="https://nazmus-shakib.netlify.app/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline text-sm md:text-base">
                             Nazmus Shakib
                         </a>
                     </b>

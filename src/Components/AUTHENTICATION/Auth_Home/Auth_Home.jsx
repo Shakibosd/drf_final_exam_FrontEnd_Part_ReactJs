@@ -1,187 +1,143 @@
+import { ShoppingCart } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
+import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import { baseUrl } from "../../../constants/env.constants";
 
 const Auth_Home = () => {
-    // Slide Section Data/
+    const [flowersLoading, setFlowersLoading] = useState(true); 
+    const [, setError] = useState(null);
+    const [flowers, setFlowers] = useState([]);
+    const [selectedFilter, setSelectedFilter] = useState("all");
+    const [filteredFlowers, setFilteredFlowers] = useState([]);
+    const [careTips, setCareTips] = useState([]);
+
+    const navigate = useNavigate();
+
+    // Slide Section Data
     const slides = [
-        {
-            id: "slide1",
-            src: "./image/demp.png",
-            alt: "slide-img-1",
-            next: "slide2",
-            prev: "slide3",
-        },
-        {
-            id: "slide2",
-            src: "./image/calimg11.png",
-            alt: "slide-img-2",
-            next: "slide3",
-            prev: "slide1",
-        },
-        {
-            id: "slide3",
-            src: "./image/calimg5.png",
-            alt: "slide-img-3",
-            next: "slide1",
-            prev: "slide2",
-        },
+        { id: "slide1", src: "./image/demp.png", alt: "slide-img-1", next: "slide2", prev: "slide3" },
+        { id: "slide2", src: "./image/calimg11.png", alt: "slide-img-2", next: "slide3", prev: "slide1" },
+        { id: "slide3", src: "./image/calimg5.png", alt: "slide-img-3", next: "slide1", prev: "slide2" },
     ];
+
     // Seasonal Flowers Data
     const seasonal_flowers = [
-        {
-            id: 1,
-            src: "./image/spring_flower.jpg",
-            title: "Spring Blooms",
-            desc: "Explore vibrant flowers that flourish in spring.",
-        },
-        {
-            id: 2,
-            src: "./image/summer_flower.jpg",
-            title: "Summer Radiance",
-            desc: "Enjoy the colors of summer with these beautiful flowers.",
-        },
-        {
-            id: 3,
-            src: "./image/autumn_flower.jpg",
-            title: "Autumn Hues",
-            desc: "Discover the rich tones of autumn blooms.",
-        },
-        {
-            id: 4,
-            src: "./image/winter_flower.jpg",
-            title: "Winter Whites",
-            desc: "Find the elegance of winter flowers.  ",
-        },
+        { id: 1, src: "./image/spring_flower.jpg", title: "Spring Blooms", desc: "Explore vibrant flowers that flourish in spring." },
+        { id: 2, src: "./image/summer_flower.jpg", title: "Summer Radiance", desc: "Enjoy the colors of summer with these beautiful flowers." },
+        { id: 3, src: "./image/autumn_flower.jpg", title: "Autumn Hues", desc: "Discover the rich tones of autumn blooms." },
+        { id: 4, src: "./image/winter_flower.jpg", title: "Winter Whites", desc: "Find the elegance of winter flowers." },
     ];
+
     // Floral Arrangement Ideas
     const floral_arrangement_ideas = [
-        {
-            id: 1,
-            src: "./image/wedding_arrangement.jpg",
-            title: "Wedding Centerpiece",
-            desc: "Elegant floral arrangements for your special day.",
-        },
-        {
-            id: 2,
-            src: "./image/home_decoration.jpg",
-            title: "Home Decoration",
-            desc: "Add beauty to your home with these ideas.",
-        },
-        {
-            id: 3,
-            src: "./image/table_setting.jpg",
-            title: "Table Settings",
-            desc: "Beautiful centerpieces for your dining table.",
-        },
+        { id: 1, src: "./image/wedding_arrangement.jpg", title: "Wedding Centerpiece", desc: "Elegant floral arrangements for your special day." },
+        { id: 2, src: "./image/home_decoration.jpg", title: "Home Decoration", desc: "Add beauty to your home with these ideas." },
+        { id: 3, src: "./image/table_setting.jpg", title: "Table Settings", desc: "Beautiful centerpieces for your dining table." },
     ];
-    // our flower api fetch
-    const [flowers, setFlowers] = useState([]);
+
+    // Flower filtering
+    const filters = [
+        "All", "Calla Lilies", "Carnations", "Daisies", "Gardenias", "Delphiniums", "Zinnias", "Alstroemeria", "Buttercups", "Queen Anne’s",
+    ];
 
     useEffect(() => {
-        fetch("https://flower-seal-backend.vercel.app/api/v1/flower/flower_all/")
+        fetch(`${baseUrl}/flower/flower_all`)
             .then((res) => res.json())
             .then((data) => {
                 setFlowers(data);
+                setFilteredFlowers(data);
+                setFlowersLoading(false);
             })
             .catch((error) => {
                 console.error("Error fetching data:", error);
+                setError("Failed to fetch flowers");
+                setFlowersLoading(false); 
+            });
+
+        fetch(`${baseUrl}/flower/care_tips`)
+            .then((res) => res.json())
+            .then((data) => setCareTips(data))
+            .catch((err) => {
+                console.error("Error fetching care tips:", err);
+                setError("Failed to fetch care tips");
             });
     }, []);
-    // flower filter
-    const [selectedFilter, setSelectedFilter] = useState("all");
-    const [filteredFlowers, setFilteredFlowers] = useState([]);
-
-    const filters = [
-        "All",
-        "Calla Lilies",
-        "Carnations",
-        "Daisies",
-        "Gardenias",
-        "Delphiniums",
-        "Zinnias",
-        "Alstroemeria",
-        "Buttercups",
-        "Queen Anne’s",
-    ];
-
-    // page load flower show
-    useEffect(() => {
-        setFilteredFlowers(flowers);
-    }, [flowers]);
 
     const handleFilterClick = (filter) => {
         setSelectedFilter(filter.toLowerCase());
         if (filter === "All") {
             setFilteredFlowers(flowers);
         } else {
-            setFilteredFlowers(
-                flowers.filter(
-                    (flower) => flower.category.toLowerCase() === filter.toLowerCase()
-                )
-            );
+            setFilteredFlowers(flowers.filter((flower) => flower.category.toLowerCase() === filter.toLowerCase()));
         }
     };
-    // flower care tips
-    const [careTips, setCareTips] = useState([]);
 
-    useEffect(() => {
-        fetch("https://flower-seal-backend.vercel.app/api/v1/flower/care_tips/")
-            .then((res) => res.json())
-            .then((data) => setCareTips(data))
-            .catch((err) => console.error("Error fetching care tips:", err));
-    }, []);
-    // flower details navigator
-    const navigate = useNavigate();
+    const handleAddToCart = async (flower_id) => {
+        const token = localStorage.getItem('auth_token');
+        try {
+            const response = await fetch(`${baseUrl}/flower/cart`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `token ${token}`
+                },
+                body: JSON.stringify({
+                    flower: flower_id.id,
+                    title: flower_id.title,
+                    price: flower_id.price,
+                    description: flower_id.description,
+                    stock: flower_id.stock,
+                    category: flower_id.category,
+                    image: flower_id.image,
+                    quantity: 1,
+                }),
+            });
+
+            const data = await response.json();
+            console.log(data);
+
+            if (response.ok) {
+                toast.success('Flower added to cart successfully!');
+                navigate('/cart');
+            } else {
+                toast.error('Product Already Added to Your Cart!');
+            }
+        } catch (error) {
+            console.error('Error adding to cart:', error);
+            toast.error('Something went wrong!');
+        }
+    };
+
     return (
         <>
-            <Helmet>
-                <title>Flower Sell</title>
-            </Helmet>
-            <div className="container mx-auto max-w-screen-xl px-6 py-3">
+            <Helmet><title>Flower Sell</title></Helmet>
+
+            <section className="container mx-auto max-w-screen-xl px-6 py-3">
                 {/* Slide Section */}
                 <section>
                     <div className="carousel w-full rounded-lg shadow-xl overflow-hidden mt-24">
                         {slides.map((slide) => (
-                            <div
-                                key={slide.id}
-                                id={slide.id}
-                                className="carousel-item relative w-full"
-                            >
-                                <img
-                                    src={slide.src}
-                                    alt={slide.alt}
-                                    className="w-full h-[400px] mobile-device-slide-img"
-                                />
+                            <div key={slide.id} id={slide.id} className="carousel-item relative w-full">
+                                <img src={slide.src} alt={slide.alt} className="w-full h-[400px] mobile-device-slide-img" />
                                 <div className="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 transform justify-between">
-                                    <a href={`#${slide.prev}`} className="btn btn-circle">
-                                        ❮
-                                    </a>
-                                    <a href={`#${slide.next}`} className="btn btn-circle">
-                                        ❯
-                                    </a>
+                                    <a href={`#${slide.prev}`} className="btn btn-circle">❮</a>
+                                    <a href={`#${slide.next}`} className="btn btn-circle">❯</a>
                                 </div>
                             </div>
                         ))}
                     </div>
                 </section>
+
                 {/* Seasonal Flowers Section */}
                 <section>
-                    <h1 className="text-3xl mt-6 text-center font-bold">
-                        Seasonal Flowers
-                    </h1>
+                    <h1 className="text-3xl mt-6 text-center font-bold">Seasonal Flowers</h1>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mt-8">
                         {seasonal_flowers.map((seasonal_flowers) => (
-                            <div
-                                key={seasonal_flowers.id}
-                                className="card card-compact bg-base-100 shadow-xl rounded-md"
-                            >
+                            <div key={seasonal_flowers.id} className="card card-compact bg-base-100 shadow-xl rounded-md">
                                 <figure>
-                                    <img
-                                        src={seasonal_flowers.src}
-                                        alt={seasonal_flowers.title}
-                                        className="w-full h-48 object-cover"
-                                    />
+                                    <img src={seasonal_flowers.src} alt={seasonal_flowers.title} className="w-full h-48 object-cover" />
                                 </figure>
                                 <div className="card-body">
                                     <h2 className="card-title">{seasonal_flowers.title}</h2>
@@ -191,34 +147,25 @@ const Auth_Home = () => {
                         ))}
                     </div>
                 </section>
+
                 {/* Floral Arrangement Ideas */}
                 <section>
-                    <h1 className="text-3xl mt-6 text-center font-bold">
-                        Floral Arrangement Ideas
-                    </h1>
+                    <h1 className="text-3xl mt-6 text-center font-bold">Floral Arrangement Ideas</h1>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-8 mt-8">
                         {floral_arrangement_ideas.map((floral_arrangement_ideas) => (
-                            <div
-                                key={floral_arrangement_ideas.id}
-                                className="card card-compact bg-base-100 shadow-xl rounded-md"
-                            >
+                            <div key={floral_arrangement_ideas.id} className="card card-compact bg-base-100 shadow-xl rounded-md">
                                 <figure>
-                                    <img
-                                        src={floral_arrangement_ideas.src}
-                                        alt={floral_arrangement_ideas.title}
-                                        className="w-full h-48 object-cover"
-                                    />
+                                    <img src={floral_arrangement_ideas.src} alt={floral_arrangement_ideas.title} className="w-full h-48 object-cover" />
                                 </figure>
                                 <div className="card-body">
-                                    <h2 className="card-title">
-                                        {floral_arrangement_ideas.title}
-                                    </h2>
+                                    <h2 className="card-title">{floral_arrangement_ideas.title}</h2>
                                     <p>{floral_arrangement_ideas.desc}</p>
                                 </div>
                             </div>
                         ))}
                     </div>
                 </section>
+
                 {/* Behind The Scenes */}
                 <section>
                     <div className="bg-[#dbf7f9] rounded-lg">
@@ -226,13 +173,8 @@ const Auth_Home = () => {
                             <h2 className="text-3xl font-bold text-gray-800">
                                 Behind The Scenes
                             </h2>
-                            <div className="flex gap-10 flex-col md:flex-row items-cente items-center mt-9">
-                                <img
-                                    src="./image/flower_preparation2.jpg"
-                                    alt="Flower Preparation"
-                                    className="w-full md:w-1/2 h-64 object-cover rounded-lg"
-                                />
-
+                            <div className="flex gap-10 flex-col md:flex-row items-center mt-9">
+                                <img src="./image/flower_preparation2.jpg" alt="Flower Preparation" className="w-full md:w-1/2 h-64 object-cover rounded-lg" />
                                 <div className="md:w-1/2 text-gray-700">
                                     <p className="text-lg">
                                         See how our beautiful flowers are prepared and arranged
@@ -245,7 +187,8 @@ const Auth_Home = () => {
                         </div>
                     </div>
                 </section>
-                {/* flower care tips */}
+
+                {/* Flower Care Tips */}
                 <section>
                     <div className="max-w-screen-xl mx-auto py-3">
                         <h2 className="text-center text-3xl font-bold">Flower Care Tips</h2>
@@ -255,47 +198,44 @@ const Auth_Home = () => {
 
                         <div style={{ lineHeight: "30px" }}>
                             {careTips.map((tip) => (
-                                <div
-                                    key={tip.id}
-                                    className="bg-white shadow-lg rounded-lg p-6 border border-gray-200"
-                                >
+                                <div key={tip.id} className="bg-white shadow-lg rounded-lg p-6 border border-gray-200">
                                     <h3 className="text-xl font-semibold text-primary">
                                         🌿 {tip.plant_name}
                                     </h3>
                                     <p>
-                                        <strong>Symptoms:</strong> {tip.symptoms}
+                                        <b>Symptoms : </b> {tip.symptoms}
                                     </p>
                                     <p>
-                                        <strong>Revival Steps:</strong> {tip.revival_steps}
+                                        <b>Revival Steps : </b> {tip.revival_steps}
                                     </p>
                                     <p>
-                                        <strong>Recommended Fertilizer:</strong>{" "}
+                                        <b>Recommended Fertilizer : </b>{" "}
                                         {tip.recommended_fertilizer}
                                     </p>
                                     <p>
-                                        <strong>Watering Caution:</strong> {tip.watering_caution}
+                                        <b>Watering Caution : </b> {tip.watering_caution}
                                     </p>
                                     <p>
-                                        <strong>Sunlight Adjustment:</strong>{" "}
+                                        <b>Sunlight Adjustment : </b>{" "}
                                         {tip.sunlight_adjustment}
                                     </p>
                                     <p>
-                                        <strong>Sunlight Needs:</strong> {tip.sunlight_needs}
+                                        <b>Sunlight Needs : </b> {tip.sunlight_needs}
                                     </p>
                                     <p>
-                                        <strong>Recommended Water Frequency:</strong>{" "}
+                                        <b>Recommended Water Frequency : </b>{" "}
                                         {tip.recommended_water_frequency}
                                     </p>
                                     <p>
-                                        <strong>Created At:</strong>{" "}
+                                        <b>Created At : </b>{" "}
                                         {new Date(tip.created_at).toLocaleDateString()}
                                     </p>
                                     <p>
-                                        <strong>Updated At:</strong>{" "}
+                                        <b>Updated At : </b>{" "}
                                         {new Date(tip.updated_at).toLocaleDateString()}
                                     </p>
                                     <p className="text-gray-500 italic">
-                                        <strong>Special Notes:</strong>{" "}
+                                        <b>Special Notes : </b>{" "}
                                         {tip.special_notes || "No special notes"}
                                     </p>
                                 </div>
@@ -303,15 +243,13 @@ const Auth_Home = () => {
                         </div>
                     </div>
                 </section>
-                {/* our flower */}
-                <section>
-                    <h1 className="text-4xl text-center font-extrabold text-gray-800">
-                        Our Flowers
-                    </h1>
 
+                {/* Our Flower */}
+                <section>
+                    <h1 className="text-center text-3xl font-bold">Our Flowers</h1>
                     {/* Flower Category Filter */}
                     <div className="container mt-6">
-                        <div className="bg-gray-100 text-black rounded-2xl shadow-xl p-6">
+                        <div className="bg-gray-200 text-black rounded-2xl shadow-xl p-6">
                             <h3 className="text-center text-2xl font-bold text-gray-700 mb-4">
                                 Flower Filter
                             </h3>
@@ -319,9 +257,13 @@ const Auth_Home = () => {
                                 {filters.map((filter) => (
                                     <li
                                         key={filter}
-                                        className={`px-5 py-2 rounded-full font-bold cursor-pointer transition-all duration-300 text-sm md:text-base 
-              ${selectedFilter === filter.toLowerCase()
-                                                ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg scale-105"
+                                        className={`px-5 py-2 rounded-full cursor-pointer transition-all duration-300 text-sm md:text-base 
+                                        font-[var(--e-global-typography-accent-font-family)] 
+                                        text-[var(--e-global-typography-accent-font-size)] 
+                                        uppercase leading-[var(--e-global-typography-accent-line-height)] 
+                                        tracking-[var(--e-global-typography-accent-letter-spacing)] border border-[var(--e-global-color-d49ac81)] 
+                                        ${selectedFilter === filter.toLowerCase()
+                                                ? "bg-gradient-to-r from-[#b47cfd] to-[#ff7fc2] text-white shadow-[inset_-25px_0px_20px_-10px_#FFB07B] scale-105"
                                                 : "bg-gray-300 text-gray-800 hover:bg-gray-400 hover:text-white"
                                             }`}
                                         onClick={() => handleFilterClick(filter)}
@@ -331,79 +273,62 @@ const Auth_Home = () => {
                                 ))}
                             </ul>
                             <div className="text-center mt-3">
-                                <strong className="text-gray-800 text-lg">
+                                <b className="text-gray-800 text-lg">
                                     Total Flowers: {filteredFlowers.length}!
-                                </strong>
+                                </b>
                             </div>
                         </div>
                     </div>
 
-                    {/* Flower Items Show */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 mt-8 lg:grid-cols-3 gap-8">
-                        {filteredFlowers
-                            .sort((a, b) => a.id - b.id)
-                            .map((flower) => (
-                                <div
-                                    key={flower.id}
-                                    className="bg-white shadow-lg rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-2xl transform hover:-translate-y-2"
-                                >
-                                    <figure>
-                                        <img
-                                            src={flower.image}
-                                            alt={flower.title}
-                                            className="w-full h-56 object-cover"
-                                        />
-                                    </figure>
-                                    <div className="p-5">
-                                        <h3 className="text-xl font-semibold text-gray-800">
-                                            {flower.title}
-                                        </h3>
-                                        <p className="text-gray-500 text-sm mt-2 line-clamp-2">
-                                            {flower.description.slice(0, 60)}...
-                                        </p>
-                                        <p className="text-gray-600 text-md mt-2">
-                                            <span className="font-semibold">In Stock:</span> {flower.stock}
-                                        </p>
-                                        <p className="text-xl font-semibold mt-2 text-blue-600">
-                                            ৳{flower.price}
-                                        </p>
-                                        <p className="text-sm font-semibold mt-2 bg-gray-200 text-gray-700 px-3 py-1 rounded-lg w-max">
-                                            {flower.category}
-                                        </p>
-                                        <div className="flex gap-3 mt-5">
-                                            <button
-                                                className="bg-blue-500 hover:bg-blue-600 text-white px-5 py-2 rounded-lg font-semibold transition-all duration-300"
-                                                onClick={() =>
-                                                    navigate(`/flower_details/?flower_id=${flower.id}`)
-                                                }
-                                            >
-                                                Details
-                                            </button>
-                                            <button className="bg-green-500 hover:bg-green-600 text-white px-5 py-2 rounded-lg font-semibold flex items-center gap-2 transition-all duration-300">
-                                                <span>Add To Cart</span>
-                                                <svg
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    className="w-5 h-5"
-                                                    fill="none"
-                                                    viewBox="0 0 24 24"
-                                                    stroke="currentColor"
-                                                >
-                                                    <path
-                                                        strokeLinecap="round"
-                                                        strokeLinejoin="round"
-                                                        strokeWidth={2}
-                                                        d="M3 3h2l3.6 7.59M7 13h10l3.6-7.59M5 21h14a1 1 0 001-1v-4H4v4a1 1 0 001 1zm16-9H4V5h16v7z"
-                                                    />
-                                                </svg>
-                                            </button>
+                    {/* Flower Listing */}
+                    {flowersLoading ? (
+                        <div className="flex flex-col justify-center items-center pt-10">
+                            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+                            <p className="mt-4 text-lg text-gray-700">Loading...</p>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 mt-8 lg:grid-cols-3 gap-8">
+                            {filteredFlowers
+                                .sort((a, b) => a.id - b.id)
+                                .map((flower) => (
+                                    <div key={flower.id} className="bg-white shadow-lg rounded-xl overflow-hidden transition-all duration-300 hover:shadow-2xl  hover:-translate-y-2">
+                                        <figure>
+                                            <img src={flower.image} alt={flower.title} className="w-full h-56 object-cover" />
+                                        </figure>
+                                        <div className="p-5">
+                                            <h3 className="text-xl font-semibold text-gray-800">
+                                                {flower.title}
+                                            </h3>
+                                            <p className="text-gray-500 text-sm mt-2 line-clamp-2">
+                                                {flower.description.slice(0, 60)}...
+                                            </p>
+                                            <p className="text-gray-600 text-md mt-2">
+                                                <span className="font-semibold">In Stock:</span> {flower.stock}
+                                            </p>
+                                            <p className="text-xl font-semibold mt-2 text-blue-600">
+                                                ৳{flower.price}
+                                            </p>
+                                            <p className="text-sm font-semibold mt-2 bg-gray-200 text-gray-700 px-3 py-1 rounded-lg w-max">
+                                                {flower.category}
+                                            </p>
+                                            <div className="flex gap-3 mt-5">
+                                                <button className="bg-blue-500 hover:bg-blue-600 text-white px-5 py-2 rounded-lg font-semibold transition-all duration-300"
+                                                    onClick={() => navigate(`/flower_details/?flower_id=${flower.id}`)}>
+                                                    Details
+                                                </button>
+                                                <button className="bg-green-500 hover:bg-green-600 text-white px-5 py-2 rounded-lg font-semibold flex items-center gap-2 transition-all duration-300"
+                                                    onClick={() => handleAddToCart(flower)}>
+                                                    <span>Add To Cart</span>
+                                                    <ShoppingCart className="w-5 h-5" />
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            ))}
-                    </div>
+                                ))}
+                        </div>
+                    )}
                 </section>
-
-            </div>
+            </section>
         </>
     );
 };

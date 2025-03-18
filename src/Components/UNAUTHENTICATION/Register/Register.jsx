@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Helmet } from "react-helmet-async";
 import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
+import { baseUrl } from "../../../constants/env.constants";
 
 const Register = () => {
     const [showPassword, setShowPassword] = useState(false);
@@ -77,7 +78,7 @@ const Register = () => {
             const profileImageUrl = imgResult.secure_url;
 
             // Send data to backend
-            const response = await fetch("https://flower-seal-backend.vercel.app/api/v1/user/register/", {
+            const response = await fetch(`${baseUrl}/user/register`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ username, email, first_name, last_name, password, confirm_password, profile_img: profileImageUrl })
@@ -107,8 +108,10 @@ const Register = () => {
                         <img className="w-full rounded-xl shadow-lg" src="./image/reg.png" alt="Register Image" />
                     </div>
                     <div className="w-full md:w-1/2 p-6 bg-white rounded-xl shadow-lg">
+                        <Link className="btn btn-info w-full" to={'/hr_login'}>Hr Login</Link>
+                        <br />
+                        <br />
                         <form onSubmit={handleRegister} className="space-y-4">
-                            <Link to={'/hr_login'} className="btn btn-accent w-full">Hr Login</Link>
                             <input type="text" name="username" placeholder="Username" required className="input input-bordered w-full" />
                             <input type="email" name="email" placeholder="Email" required className="input input-bordered w-full" />
                             <input type="text" name="first_name" placeholder="First Name" required className="input input-bordered w-full" />
@@ -122,7 +125,7 @@ const Register = () => {
                                 <span className="absolute right-3 top-3 cursor-pointer" onClick={() => togglePassword("confirm_password")}>{showConfirmPassword ? "👁️" : "🙈"}</span>
                             </div>
                             <input type="file" name="profile_img" required className="file-input file-input-bordered w-full" />
-                            <button type="submit" className="btn btn-success w-full" disabled={loading}>{loading ? "Loading..." : "Register"}</button>
+                            <button type="submit" className="btn btn-accent w-full" disabled={loading}>{loading ? "Loading..." : "Register"}</button>
                         </form>
                         <Link to={'/login'} className="text-center block mt-3 text-blue-500 underline">Already have an account? Login</Link>
                     </div>

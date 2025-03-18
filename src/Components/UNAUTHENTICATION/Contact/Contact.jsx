@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { toast } from "react-hot-toast";
+import { baseUrl } from "../../../constants/env.constants";
 
 const ContactForm = () => {
     const [formData, setFormData] = useState({
@@ -24,7 +25,7 @@ const ContactForm = () => {
         setLoading(true);
 
         try {
-            const response = await fetch("https://flower-seal-backend.vercel.app/api/v1/flower/contact/", {
+            const response = await fetch(`${baseUrl}/flower/contact`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
+import { baseUrl } from "../../../constants/env.constants";
 
 const Home = () => {
-    // Slide Section Data/
+    // Slide Section Data
     const slides = [
         { id: 'slide1', src: './image/demp.png', alt: 'slide-img-1', next: 'slide2', prev: 'slide3' },
         { id: 'slide2', src: './image/calimg11.png', alt: 'slide-img-2', next: 'slide3', prev: 'slide1' },
@@ -13,7 +14,7 @@ const Home = () => {
         { id: 1, src: "./image/spring_flower.jpg", title: "Spring Blooms", desc: "Explore vibrant flowers that flourish in spring." },
         { id: 2, src: "./image/summer_flower.jpg", title: "Summer Radiance", desc: "Enjoy the colors of summer with these beautiful flowers." },
         { id: 3, src: "./image/autumn_flower.jpg", title: "Autumn Hues", desc: "Discover the rich tones of autumn blooms." },
-        { id: 4, src: "./image/winter_flower.jpg", title: "Winter Whites", desc: "Find the elegance of winter flowers.  " },
+        { id: 4, src: "./image/winter_flower.jpg", title: "Winter Whites", desc: "Find the elegance of winter flowers." },
     ];
     // Floral Arrangement Ideas
     const floral_arrangement_ideas = [
@@ -23,18 +24,21 @@ const Home = () => {
     ];
     // our flower api fetch
     const [flowers, setFlowers] = useState([]);
+    const [loading, setLoading] = useState(true); 
 
     useEffect(() => {
-        fetch("https://flower-seal-backend.vercel.app/api/v1/flower/flower_all/")
+        fetch(`${baseUrl}/flower/flower_all`)
             .then((res) => res.json())
             .then((data) => {
                 setFlowers(data);
+                setLoading(false); 
             })
             .catch((error) => {
                 console.error("Error fetching data:", error);
-
+                setLoading(false); 
             });
     }, []);
+
     return (
         <>
             <Helmet><title>Flower Sell</title></Helmet>
@@ -92,13 +96,12 @@ const Home = () => {
                     <div className="bg-[#dbf7f9] rounded-lg">
                         <div className="max-w-5xl mx-auto text-center px-6 mt-9 p-5">
                             <h2 className="text-3xl font-bold text-gray-800">Behind The Scenes</h2>
-                            <div className="flex gap-10 flex-col md:flex-row items-cente items-center mt-9">
+                            <div className="flex gap-10 flex-col md:flex-row items-center mt-9">
                                 <img
                                     src="./image/flower_preparation2.jpg"
                                     alt="Flower Preparation"
                                     className="w-full md:w-1/2 h-64 object-cover rounded-lg"
                                 />
-
                                 <div className="md:w-1/2 text-gray-700">
                                     <p className="text-lg">
                                         See how our beautiful flowers are prepared and arranged before they reach you.
@@ -113,21 +116,28 @@ const Home = () => {
                 {/* our flower */}
                 <section>
                     <h1 className="text-3xl mt-6 text-center font-bold">Our Flower</h1>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 mt-6 lg:grid-cols-3 gap-8">
-                        {flowers.map((flower) => (
-                            <div key={flower.id} className="card bg-white shadow-md rounded-lg overflow-hidden">
-                                <figure>
-                                    <img src={flower.image} alt={flower.title} className="w-full h-52 object-cover" />
-                                </figure>
-                                <div className="p-4">
-                                    <h3 className="text-lg font-semibold">{flower.title}</h3>
-                                    <p className="text-gray-600 text-sm mt-2 line-clamp-2">{flower.description.slice(0,40)}.....</p>
-                                    <p className="text-lg font-semibold line-clamp-2 mt-2 text-primary"><b>৳</b>{flower.price}</p>
-                                    <p className="text-lg font-semibold mt-2 btn w-40">{flower.category}</p>
+                    {loading ? (
+                        <div className="flex flex-col justify-center items-center pt-10">
+                            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+                            <p className="mt-4 text-lg text-gray-700">Loading...</p>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 mt-6 lg:grid-cols-3 gap-8">
+                            {flowers.map((flower) => (
+                                <div key={flower.id} className="card bg-white shadow-md rounded-lg overflow-hidden">
+                                    <figure>
+                                        <img src={flower.image} alt={flower.title} className="w-full h-52 object-cover" />
+                                    </figure>
+                                    <div className="p-4">
+                                        <h3 className="text-lg font-semibold">{flower.title}</h3>
+                                        <p className="text-gray-600 text-sm mt-2 line-clamp-2">{flower.description.slice(0, 40)}.....</p>
+                                        <p className="text-lg font-semibold line-clamp-2 mt-2 text-primary"><b>৳</b>{flower.price}</p>
+                                        <p className="text-lg font-semibold mt-2 btn w-40 whitespace-nowrap">{flower.category}</p>
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
-                    </div>
+                            ))}
+                        </div>
+                    )}
                 </section>
             </div>
         </>

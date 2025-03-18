@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
+import { Helmet } from "react-helmet-async";
 import { toast } from "react-hot-toast";
 
 const Profile = () => {
     const userId = localStorage.getItem("userId");
-
+    const [loading, setLoading] = useState(true);
     const [profile, setProfile] = useState({
         username: "",
         first_name: "",
@@ -12,26 +13,32 @@ const Profile = () => {
         profile_img: "",
     });
 
-    const [, setSelectedFile] = useState(null);
-
-    // প্রোফাইল ডেটা ফেচ করা
     const fetchProfile = () => {
-        if (!userId) return;
+        if (!userId) {
+            setLoading(false); 
+            return;
+        }
 
-        fetch(`https://flower-seal-backend.vercel.app/api/v1/user/user_detail/${userId}/`)
+        fetch(`http://127.0.0.1:8000/api/v1/user/user_detail/${userId}`)
             .then((response) => response.json())
             .then((data) => {
+                console.log("Fetched Profile Data (After Update):", data);
                 if (data && typeof data === "object") {
-                    setProfile(data);
+                    setProfile({
+                        ...data,
+                        profile_img: data.profile_img || "",
+                    });
                 } else {
                     toast.error("User not found!");
                 }
             })
-            .catch(() => toast.error("Failed to fetch profile data"));
+            .catch(() => toast.error("Failed to fetch profile data"))
+            .finally(() => setLoading(false)); 
     };
 
     useEffect(() => {
         fetchProfile();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [userId]);
 
     const handleChange = (e) => {
@@ -41,8 +48,6 @@ const Profile = () => {
     const handleFileChange = async (event) => {
         const file = event.target.files[0];
         if (!file) return;
-
-        setSelectedFile(file);
 
         const formData = new FormData();
         formData.append("file", file);
@@ -55,93 +60,138 @@ const Profile = () => {
             });
 
             const data = await response.json();
+            console.log("Uploaded Image URL:", data.secure_url);
+
             if (data.secure_url) {
                 setProfile((prevProfile) => ({
                     ...prevProfile,
                     profile_img: data.secure_url,
                 }));
+
                 toast.success("Image uploaded successfully!");
+
+                const token = localStorage.getItem('auth_token');
+                const updatedProfile = {
+                    profile: {
+                        profile_img: data.secure_url,
+                    },
+                };
+
+                const saveResponse = await fetch(`http://127.0.0.1:8000/api/v1/user/user_detail/${userId}`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `token ${token}`
+                    },
+                    body: JSON.stringify(updatedProfile),
+                });
+
+                if (saveResponse.ok) {
+                    toast.success("Profile image updated in database!");
+                    fetchProfile(); 
+                } else {
+                    const errorData = await saveResponse.json();
+                    console.error("Error updating profile:", errorData);
+                    toast.error("Failed to update profile image in database!");
+                }
             } else {
                 toast.error("Image upload failed!");
             }
         } catch (error) {
-            toast.error("Error uploading image!", error);
+            console.error("Error uploading image:", error);
+            toast.error("Error uploading image!");
         }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const formData = new FormData();
-        formData.append("username", profile.username);
-        formData.append("first_name", profile.first_name);
-        formData.append("last_name", profile.last_name);
-        formData.append("email", profile.email);
 
-        if (profile.profile_img) {
-            formData.append("profile_img", profile.profile_img);
-        }
+        const updatedProfile = {
+            username: profile.username,
+            first_name: profile.first_name,
+            last_name: profile.last_name,
+            email: profile.email,
+            profile: {
+                profile_img: profile.profile_img,
+            },
+        };
+
+        const token = localStorage.getItem('auth_token');
 
         try {
-            const response = await fetch(`https://flower-seal-backend.vercel.app/api/v1/user/user_detail/${userId}/`, {
+            const response = await fetch(`http://127.0.0.1:8000/api/v1/user/user_detail/${userId}`, {
                 method: "PUT",
-                body: formData,
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `token ${token}`
+                },
+                body: JSON.stringify(updatedProfile),
             });
 
             if (response.ok) {
                 toast.success("Profile updated successfully!");
-                fetchProfile();
+                fetchProfile(); 
             } else {
                 const errorData = await response.json();
+                console.error("Error updating profile:", errorData);
                 toast.error(errorData.message || "Failed to update profile!");
             }
-        } catch {
+        } catch (error) {
+            console.error("Error:", error);
             toast.error("Something went wrong!");
         }
     };
 
     return (
-        <section className="pt-24">
-            <h1 className="text-3xl font-bold text-center">Welcome {profile.username}</h1>
-            <div className="flex justify-center items-center mt-6">
-                <div className="w-full max-w-lg bg-white shadow-lg rounded-2xl p-6">
-                    <form className="space-y-4" onSubmit={handleSubmit}>
-                        <div className="flex flex-col items-center">
-                            <img
-                                key={profile.profile_img}
-                                src={profile.profile_img}
-                                alt="Profile"
-                                className="w-40 h-40 rounded-full mx-auto"
-                            />
-                            <button
-                                type="button"
-                                className="btn btn-sm btn-outline mt-2"
-                                onClick={() => document.getElementById("fileInput").click()}
-                            >
-                                Change Photo
-                            </button>
-                            <input type="file" id="fileInput" className="hidden" accept="image/*" onChange={handleFileChange} />
-                        </div>
-                        <div>
-                            <label className="label font-semibold">Username</label>
-                            <input type="text" className="input input-bordered w-full" name="username" value={profile.username} onChange={handleChange} required />
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <label className="label font-semibold">First Name</label>
-                                <input type="text" className="input input-bordered w-full" name="first_name" value={profile.first_name} onChange={handleChange} required />
+        <section>
+            <div className="pt-24">
+                <Helmet><title>Profile</title></Helmet>
+                {loading ? (
+                    // Loading Spinner
+                    <div className="flex flex-col justify-center items-center pt-10">
+                        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+                        <p className="mt-4 text-lg text-gray-700">Loading...</p>
+                    </div>
+                ) : (
+                    // Profile Form
+                    <>
+                        <h1 className="text-3xl font-bold text-center">Welcome {profile.username}</h1>
+                        <div className="flex justify-center items-center mt-6">
+                            <div className="w-full max-w-lg bg-white shadow-lg rounded-2xl p-6">
+                                <form encType="multipart/form-data" className="space-y-4" onSubmit={handleSubmit}>
+                                    <div className="flex flex-col items-center">
+                                        <img key={profile.profile_img} src={`${profile.profile_img}?t=${new Date().getTime()}`} alt="Profile" className="w-60 h-60 object-cover rounded-full mx-auto" />
+                                        <button type="button" className="btn btn-sm btn-outline mt-2" onClick={() => document.getElementById("fileInput").click()}>
+                                            Change Photo
+                                        </button>
+                                        <input type="file" id="fileInput" className="hidden" accept="image/*" onChange={handleFileChange} />
+                                    </div>
+                                    <div>
+                                        <label className="label font-semibold">Username</label>
+                                        <input type="text" className="input input-bordered w-full" name="username" value={profile.username} onChange={handleChange} required />
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="label font-semibold">First Name</label>
+                                            <input type="text" className="input input-bordered w-full" name="first_name" value={profile.first_name} onChange={handleChange} required />
+                                        </div>
+                                        <div>
+                                            <label className="label font-semibold">Last Name</label>
+                                            <input type="text" className="input input-bordered w-full" name="last_name" value={profile.last_name} onChange={handleChange} required />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="label font-semibold">Email</label>
+                                        <input type="email" className="input input-bordered w-full" name="email" value={profile.email} onChange={handleChange} required />
+                                    </div>
+                                    <button type="submit" className="btn btn-primary w-full">
+                                        Update Profile
+                                    </button>
+                                </form>
                             </div>
-                            <div>
-                                <label className="label font-semibold">Last Name</label>
-                                <input type="text" className="input input-bordered w-full" name="last_name" value={profile.last_name} onChange={handleChange} required />
-                            </div>
                         </div>
-                        <div>
-                            <label className="label font-semibold">Email</label>
-                            <input type="email" className="input input-bordered w-full" name="email" value={profile.email} onChange={handleChange} required />
-                        </div>
-                        <button type="submit" className="btn btn-primary w-full">Update Profile</button>
-                    </form>
-                </div>
+                    </>
+                )}
             </div>
         </section>
     );

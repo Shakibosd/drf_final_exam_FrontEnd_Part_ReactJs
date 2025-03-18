@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { toast } from "react-hot-toast";
+import { baseUrl } from "../../../constants/env.constants";
 
 const OTP = () => {
     const [email, setEmail] = useState("");
@@ -36,7 +37,7 @@ const OTP = () => {
         const enteredOtp = otp.join("");
 
         try {
-            const response = await fetch("https://flower-seal-backend.vercel.app/api/v1/user/verify_otp/", {
+            const response = await fetch(`${baseUrl}/user/verify_otp`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, otp: enteredOtp }),
@@ -60,7 +61,7 @@ const OTP = () => {
         setTimer(30);
 
         try {
-            const response = await fetch("https://flower-seal-backend.vercel.app/api/v1/user/resend_otp/", {
+            const response = await fetch(`${baseUrl}/user/resend_otp`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email: emailResend }),
@@ -86,26 +87,13 @@ const OTP = () => {
                 <div className="p-6 bg-white shadow-lg rounded-lg w-full">
                     <form id="otp-form" className="space-y-4" onSubmit={handleVerifyOTP}>
                         <label htmlFor="email" className="font-bold">Email</label>
-                        <input
-                            type="email"
-                            id="email"
-                            className="input input-bordered w-full"
-                            placeholder="Enter Your Email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
+                        <input type="email" id="email" className="input input-bordered w-full" placeholder="Enter Your Email" value={email} onChange={(e) => setEmail(e.target.value)} required
                         />
                         <div>
                             <label className="font-bold">OTP Code</label>
                             <div className="flex w-full justify-between">
                                 {otp.map((digit, index) => (
-                                    <input
-                                        key={index}
-                                        type="text"
-                                        className="input input-bordered w-20"
-                                        maxLength="1"
-                                        value={digit}
-                                        onChange={(e) => handleOtpChange(index, e.target.value)}
+                                    <input key={index} type="text" className="input input-bordered w-20" maxLength="1" value={digit} onChange={(e) => handleOtpChange(index, e.target.value)}
                                     />
                                 ))}
                             </div>
@@ -118,14 +106,7 @@ const OTP = () => {
                 <div className="p-6 bg-white shadow-lg rounded-lg w-full">
                     <form id="otp-resend-form" className="space-y-4" onSubmit={handleResendOTP}>
                         <label htmlFor="email_resend" className="font-bold">Email</label>
-                        <input
-                            type="email"
-                            id="email_resend"
-                            className="input input-bordered w-full"
-                            placeholder="Enter Your Email"
-                            value={emailResend}
-                            onChange={(e) => setEmailResend(e.target.value)}
-                            required
+                        <input type="email" id="email_resend" className="input input-bordered w-full" placeholder="Enter Your Email" value={emailResend} onChange={(e) => setEmailResend(e.target.value)} required
                         />
                         <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded-lg w-full md:w-1/3" disabled={resendDisabled}>
                             {resendDisabled ? `Resend OTP (${timer}s)` : "Resend OTP"}

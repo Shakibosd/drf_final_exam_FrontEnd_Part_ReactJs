@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { toast } from "react-hot-toast";
 import { useNavigate, useParams } from "react-router-dom";
+import { baseUrl } from "../../../constants/env.constants";
 
 const Reset_Password = () => {
     const { uid64, token } = useParams();
@@ -25,7 +26,7 @@ const Reset_Password = () => {
 
         setLoading(true);
         try {
-            const response = await fetch(`http://127.0.0.1:8000/api/v1/pass_change/reset_password/${uid64}/${token}/`, {
+            const response = await fetch(`${baseUrl}/pass_change/reset_password/${uid64}/${token}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
