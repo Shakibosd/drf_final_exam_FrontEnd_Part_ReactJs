@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import { Helmet } from "react-helmet-async";
+import { baseUrl } from "../../../constants/env.constants";
 
 const Admin_Flower_Show = () => {
     const [posts, setPosts] = useState([]);
@@ -15,7 +16,7 @@ const Admin_Flower_Show = () => {
 
     const fetchPosts = async () => {
         try {
-            const response = await fetch("http://127.0.0.1:8000/api/v1/flower/flower_all");
+            const response = await fetch(`${baseUrl}/flower/flower_all/`);
             const data = await response.json();
             setPosts(data);
         } catch (error) {
@@ -37,7 +38,7 @@ const Admin_Flower_Show = () => {
     const handleDelete = async () => {
         if (deletePostId) {
             try {
-                const response = await fetch(`http://127.0.0.1:8000/api/v1/flower/flower_detail/${deletePostId}`, {
+                const response = await fetch(`${baseUrl}/flower/flower_detail/${deletePostId}/`, {
                     method: "DELETE",
                 });
                 if (response.ok) {
@@ -58,7 +59,7 @@ const Admin_Flower_Show = () => {
     const handleUpdate = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch(`http://127.0.0.1:8000/api/v1/flower/flower_detail/${editPost.id}`, {
+            const response = await fetch(`${baseUrl}/flower/flower_detail/${editPost.id}/`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",

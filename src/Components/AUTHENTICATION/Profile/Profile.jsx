@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { toast } from "react-hot-toast";
+import { baseUrl } from "../../../constants/env.constants";
 
 const Profile = () => {
     const userId = localStorage.getItem("userId");
@@ -19,7 +20,7 @@ const Profile = () => {
             return;
         }
 
-        fetch(`http://127.0.0.1:8000/api/v1/user/user_detail/${userId}`)
+        fetch(`${baseUrl}/user/user_detail/${userId}/`)
             .then((response) => response.json())
             .then((data) => {
                 console.log("Fetched Profile Data (After Update):", data);
@@ -77,7 +78,7 @@ const Profile = () => {
                     },
                 };
 
-                const saveResponse = await fetch(`http://127.0.0.1:8000/api/v1/user/user_detail/${userId}`, {
+                const saveResponse = await fetch(`${baseUrl}/user/user_detail/${userId}/`, {
                     method: "PUT",
                     headers: {
                         "Content-Type": "application/json",
@@ -119,7 +120,7 @@ const Profile = () => {
         const token = localStorage.getItem('auth_token');
 
         try {
-            const response = await fetch(`http://127.0.0.1:8000/api/v1/user/user_detail/${userId}`, {
+            const response = await fetch(`${baseUrl}/user/user_detail/${userId}/`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",

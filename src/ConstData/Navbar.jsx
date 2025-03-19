@@ -2,6 +2,7 @@ import { ChevronDown, Menu, Moon, ShoppingCart, Sun, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
+import { baseUrl } from "../constants/env.constants";
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -19,7 +20,7 @@ const Navbar = () => {
                 setIsLoggedIn(true);
 
                 try {
-                    const response = await fetch("http://127.0.0.1:8000/api/v1/admins", {
+                    const response = await fetch(`${baseUrl}/admins/`, {
                         method: "GET",
                         headers: {
                             Authorization: `token ${token}`,
@@ -50,7 +51,6 @@ const Navbar = () => {
     }, []);
 
     useEffect(() => {
-        // Apply dark mode class to the body
         if (isDarkMode) {
             document.documentElement.classList.add("dark");
         } else {
@@ -63,7 +63,7 @@ const Navbar = () => {
 
     const handleLogout = async () => {
         try {
-            const response = await fetch("http://127.0.0.1:8000/api/v1/user/logout", {
+            const response = await fetch(`${baseUrl}/user/logout/`, {
                 method: "GET",
                 headers: {
                     Authorization: `token ${token}`,
@@ -161,10 +161,7 @@ const Navbar = () => {
                             </li>
 
                             <li>
-                                <button
-                                    onClick={() => logoutModalRef.current.showModal()}
-                                    className="hover:text-primary cursor-pointer block">
-                                    <b>Logout</b>
+                                <button onClick={() => logoutModalRef.current.showModal()} className="hover:text-primary cursor-pointer block"> <b>Logout</b>
                                 </button>
                             </li>
                         </>

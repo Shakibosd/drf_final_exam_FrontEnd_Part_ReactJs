@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
+import { baseUrl } from "../../../constants/env.constants";
 
 const User = () => {
     const [users, setUsers] = useState([]);
@@ -10,7 +11,7 @@ const User = () => {
             const token = localStorage.getItem("auth_token");
             try {
                 const response = await fetch(
-                    "http://127.0.0.1:8000/api/v1/user/user_all",
+                    `${baseUrl}/user/user_all/`,
                     {
                         method: "GET",
                         headers: {
@@ -27,7 +28,7 @@ const User = () => {
                 setLoading(false);
             }
         };
-
+        
         fetchUsers();
     }, []);
 

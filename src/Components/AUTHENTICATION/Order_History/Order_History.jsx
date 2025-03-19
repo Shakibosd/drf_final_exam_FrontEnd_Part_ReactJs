@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import toast, { Toaster } from "react-hot-toast";
+import { baseUrl } from "../../../constants/env.constants";
 
 const OrderHistory = () => {
     const [orders, setOrders] = useState([]);
@@ -12,7 +13,7 @@ const OrderHistory = () => {
         setLoading(true);
         const token = localStorage.getItem("auth_token");
         try {
-            const response = await fetch("http://127.0.0.1:8000/api/v1/order/my_order", {
+            const response = await fetch(`${baseUrl}/order/my_order/`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -57,7 +58,7 @@ const OrderHistory = () => {
         const fetchStats = async () => {
             try {
                 const response = await fetch(
-                    "http://127.0.0.1:8000/api/v1/order/one_user_order_stats",
+                    `${baseUrl}/order/one_user_order_stats/`,
                     {
                         method: "GET",
                         headers: {
@@ -126,8 +127,8 @@ const OrderHistory = () => {
                                 <p className="text-2xl font-bold">{stats.pending_payments}</p>
                             </div>
                             <div className="bg-red-500 text-white p-6 rounded-lg shadow-md text-center w-full">
-                                <h3 className="text-lg font-semibold whitespace-nowrap">Completed Order Amount</h3>
-                                <p className="text-2xl font-bold">{stats["completed_order_amount"]} ৳</p>
+                                <h3 className="text-lg font-semibold whitespace-nowrap">Total Payment Amount</h3>
+                                <p className="text-2xl font-bold">{stats["total_payment_amount"]} ৳</p>
                             </div>
                             <div className="bg-red-900 text-white p-6 rounded-lg shadow-md text-center w-full">
                                 <h3 className="text-lg font-semibold whitespace-nowrap">Total Order Flower Price</h3>
@@ -166,12 +167,7 @@ const OrderHistory = () => {
                                                     {order.transaction_id || "N/A"}
                                                 </td>
                                                 <td className="whitespace-nowrap">
-                                                    {new Date(order.order_date).toLocaleDateString("en-US", {
-                                                        hour: "numeric",
-                                                        minute: "numeric",
-                                                        second: "numeric",
-                                                        hour12: true,
-                                                    })}
+                                                    {order.order_date}
                                                 </td>
                                             </tr>
                                         ))

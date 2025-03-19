@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
+import { baseUrl } from "../../../constants/env.constants";
 
 const Add_Flower = () => {
     const navigate = useNavigate();
@@ -40,7 +41,7 @@ const Add_Flower = () => {
                 image: imageUrl,
             };
 
-            const response = await fetch("http://127.0.0.1:8000/api/v1/flower/flower_all", {
+            const response = await fetch(`${baseUrl}/flower/flower_all/`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

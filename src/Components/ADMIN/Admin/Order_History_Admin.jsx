@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
+import { baseUrl } from "../../../constants/env.constants";
 
 const Order_History_Admin = () => {
     const [orders, setOrders] = useState([]);
@@ -16,7 +17,7 @@ const Order_History_Admin = () => {
 
         const fetchOrders = async () => {
             try {
-                const response = await fetch("http://127.0.0.1:8000/api/v1/order/all_order", {
+                const response = await fetch(`${baseUrl}/order/all_order/`, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
@@ -39,7 +40,7 @@ const Order_History_Admin = () => {
 
         const fetchStats = async () => {
             try {
-                const response = await fetch("http://127.0.0.1:8000/api/v1/order/user_order_stats", {
+                const response = await fetch(`${baseUrl}/order/user_order_stats/`, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",

@@ -23,7 +23,7 @@ const Login = () => {
         setError("");
 
         try {
-            const response = await fetch(`${baseUrl}/user/login`, {
+            const response = await fetch(`${baseUrl}/user/login/`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -55,8 +55,6 @@ const Login = () => {
             toast.error(error.message || "Failed To Login. Please Try Again");
         }
     };
-
-
 
     return (
         <>

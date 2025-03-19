@@ -43,7 +43,7 @@ const Auth_Home = () => {
     ];
 
     useEffect(() => {
-        fetch(`${baseUrl}/flower/flower_all`)
+        fetch(`${baseUrl}/flower/flower_all/`)
             .then((res) => res.json())
             .then((data) => {
                 setFlowers(data);
@@ -56,7 +56,7 @@ const Auth_Home = () => {
                 setFlowersLoading(false); 
             });
 
-        fetch(`${baseUrl}/flower/care_tips`)
+        fetch(`${baseUrl}/flower/care_tips/`)
             .then((res) => res.json())
             .then((data) => setCareTips(data))
             .catch((err) => {
@@ -77,7 +77,7 @@ const Auth_Home = () => {
     const handleAddToCart = async (flower_id) => {
         const token = localStorage.getItem('auth_token');
         try {
-            const response = await fetch(`${baseUrl}/flower/cart`, {
+            const response = await fetch(`${baseUrl}/flower/cart/`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

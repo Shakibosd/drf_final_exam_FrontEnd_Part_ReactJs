@@ -78,7 +78,7 @@ const Register = () => {
             const profileImageUrl = imgResult.secure_url;
 
             // Send data to backend
-            const response = await fetch(`${baseUrl}/user/register`, {
+            const response = await fetch(`${baseUrl}/user/register/`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ username, email, first_name, last_name, password, confirm_password, profile_img: profileImageUrl })

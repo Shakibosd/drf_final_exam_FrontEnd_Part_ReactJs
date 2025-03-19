@@ -27,7 +27,7 @@ const Home = () => {
     const [loading, setLoading] = useState(true); 
 
     useEffect(() => {
-        fetch(`${baseUrl}/flower/flower_all`)
+        fetch(`${baseUrl}/flower/flower_all/`)
             .then((res) => res.json())
             .then((data) => {
                 setFlowers(data);

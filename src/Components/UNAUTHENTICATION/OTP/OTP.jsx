@@ -37,7 +37,7 @@ const OTP = () => {
         const enteredOtp = otp.join("");
 
         try {
-            const response = await fetch(`${baseUrl}/user/verify_otp`, {
+            const response = await fetch(`${baseUrl}/user/verify_otp/`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, otp: enteredOtp }),
@@ -61,7 +61,7 @@ const OTP = () => {
         setTimer(30);
 
         try {
-            const response = await fetch(`${baseUrl}/user/resend_otp`, {
+            const response = await fetch(`${baseUrl}/user/resend_otp/`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email: emailResend }),

@@ -25,7 +25,7 @@ const ContactForm = () => {
         setLoading(true);
 
         try {
-            const response = await fetch(`${baseUrl}/flower/contact`, {
+            const response = await fetch(`${baseUrl}/flower/contact/`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
-import toast, { Toaster } from "react-hot-toast";
+import { toast } from "react-hot-toast";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { baseUrl } from "../../../constants/env.constants";
 
 const Flower_Details = () => {
     const location = useLocation();
@@ -9,10 +10,11 @@ const Flower_Details = () => {
     const id = params.get("flower_id");
     const [flower, setFlower] = useState(null);
     const [loading, setLoading] = useState(true);
+
     const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState("");
     const [canComment, setCanComment] = useState(false);
-    const [quantity, setQuantity] = useState();
+    const [quantity, setQuantity] = useState(1);
     const [editingComment, setEditingComment] = useState(null);
     const [editCommentText, setEditCommentText] = useState("");
     const navigate = useNavigate();
@@ -26,13 +28,14 @@ const Flower_Details = () => {
     }, []);
 
     useEffect(() => {
-        // Fetch flower details
         if (!id) return;
 
         const fetchFlowerDetails = async () => {
             try {
-                const response = await fetch(`http://127.0.0.1:8000/api/v1/flower/flower_detail/${id}`);
-                if (!response.ok) throw new Error("Flower not found!");
+                const response = await fetch(`${baseUrl}/flower/flower_detail/${id}/`);
+                if (!response.ok) {
+                    throw new Error("Flower not found!");
+                }
                 const data = await response.json();
                 setFlower(data);
             } catch (error) {
@@ -41,14 +44,14 @@ const Flower_Details = () => {
             } finally {
                 setLoading(false);
             }
-        };
+        }
 
         // Check order status
         const checkOrder = async () => {
             const token = localStorage.getItem('auth_token');
 
             try {
-                const response = await fetch(`http://127.0.0.1:8000/api/v1/flower/comment_check_order/?flower_id=${id}`, {
+                const response = await fetch(`${baseUrl}/flower/comment_check_order/?flower_id=${id}`, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
@@ -67,7 +70,7 @@ const Flower_Details = () => {
         const fetchComments = async () => {
             try {
                 const token = localStorage.getItem('auth_token');
-                const response = await fetch(`http://127.0.0.1:8000/api/v1/flower/comment_show/${id}`, {
+                const response = await fetch(`${baseUrl}/flower/comment_show/${id}/`, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
@@ -95,7 +98,7 @@ const Flower_Details = () => {
 
         const token = localStorage.getItem('auth_token');
         try {
-            const response = await fetch("http://127.0.0.1:8000/api/v1/flower/comment_all", {
+            const response = await fetch(`${baseUrl}/flower/comment_all/`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -109,6 +112,7 @@ const Flower_Details = () => {
                 console.log(responseData);
                 toast.success("✅ Comment added successfully!");
                 setNewComment("");
+
                 setComments(prevComments => [...prevComments, responseData]);
             } else {
                 const errorData = await response.json();
@@ -130,7 +134,7 @@ const Flower_Details = () => {
         }
 
         try {
-            const response = await fetch("http://127.0.0.1:8000/api/v1/order/create_order", {
+            const response = await fetch(`${baseUrl}/order/create_order/`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -154,7 +158,6 @@ const Flower_Details = () => {
         }
     };
 
-
     //payment
     const handlePayment = async () => {
         const token = localStorage.getItem('auth_token');
@@ -164,8 +167,10 @@ const Flower_Details = () => {
             return;
         }
 
+        console.log("Flower Id -> ",id);
+
         try {
-            const checkOrderResponse = await fetch(`http://127.0.0.1:8000/api/v1/flower/comment_check_order/?flower_id=${id}`, {
+            const checkOrderResponse = await fetch(`${baseUrl}/flower/comment_check_order/?flower_id=${id}`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -180,8 +185,7 @@ const Flower_Details = () => {
                 return;
             }
 
-            // Proceed to payment
-            const paymentResponse = await fetch(`http://127.0.0.1:8000/api/v1/payments/payment_detail/${id}`, {
+            const paymentResponse = await fetch(`${baseUrl}/payments/payment_detail/${id}/`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -191,6 +195,7 @@ const Flower_Details = () => {
 
             if (paymentResponse.ok) {
                 const paymentData = await paymentResponse.json();
+                console.log("Redirecting to:", paymentData.redirect_url);
                 window.location.href = paymentData.redirect_url;
             } else {
                 const errorData = await paymentResponse.json();
@@ -202,12 +207,11 @@ const Flower_Details = () => {
         }
     };
 
-
     // Edit comment
     const handleEditComment = async (commentId) => {
         const token = localStorage.getItem('auth_token');
         try {
-            const response = await fetch(`http://127.0.0.1:8000/api/v1/flower/comment_edit/${commentId}`, {
+            const response = await fetch(`${baseUrl}/flower/comment_edit/${commentId}/`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -224,6 +228,8 @@ const Flower_Details = () => {
                     )
                 );
                 document.getElementById("editModal").close();
+                setEditingComment(null);
+                setEditCommentText("");
             } else {
                 const errorData = await response.json();
                 toast.error(`❌ Failed to update comment: ${errorData.message || "Try again!"}`);
@@ -244,7 +250,7 @@ const Flower_Details = () => {
         }
 
         try {
-            const response = await fetch(`http://127.0.0.1:8000/api/v1/flower/comment_delete/${commentId}`, {
+            const response = await fetch(`${baseUrl}/flower/comment_delete/${commentId}/`, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",
@@ -277,15 +283,19 @@ const Flower_Details = () => {
             <Helmet><title>Flower Details</title></Helmet>
             {flower ? (
                 <div className="bg-white shadow-md rounded-lg overflow-hidden">
+
                     <figure>
                         <img src={flower.image} alt={flower.title} className="w-full h-72" />
                     </figure>
+
                     <div className="p-6">
                         <h1 className="text-2xl font-bold">{flower.title}</h1>
                         <p className="text-gray-600 mt-2">{flower.description}</p>
-                        <p className="text-lg font-bold text-primary mt-2">৳{flower.price}</p>
-                        <p className="text-gray-600 text-lg mt-2">Stock: {flower.stock}</p>
+                        <p className="text-lg font-bold text-primary mt-2"><b>৳</b>{flower.price}</p>
+                        <p className="text-gray-600 text-lg mt-2">Product In Stock {' -> '} {flower.stock}</p>
+                        <p className="text-lg font-semibold mt-2 btn w-40">{flower.category}</p>
 
+                        {/* Buttons */}
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
                             <Link to={'/auth_home'} className="btn btn-primary w-full">Back</Link>
                             <button className="btn btn-secondary w-full" onClick={() => document.getElementById('orderModal').showModal()}>Order Now</button>
@@ -301,38 +311,69 @@ const Flower_Details = () => {
                                 Submit Comment
                             </button>
                         </div>
+
+                        {/* Order Modal */}
+                        <dialog id="orderModal" className="modal">
+                            <div className="modal-box">
+                                <h3 className="text-lg font-bold">Place Your Order</h3>
+                                <input type="number" className="input input-bordered w-full mt-2" value={quantity} onChange={(e) => setQuantity(e.target.value)} min="1"
+                                />
+                                <div className="modal-action">
+                                    <button className="btn btn-primary" onClick={handleOrder}>Order</button>
+                                    <button className="btn" onClick={() => document.getElementById("orderModal").close()}>Close</button>
+                                </div>
+                            </div>
+                        </dialog>
                     </div>
                 </div>
-            ) : (<p className="text-center text-red-500">Flower not found!</p>)}
+            ) : (
+                <p className="text-center text-red-500">Flower not found!</p>
+            )}
 
-            {/* Display Comments */}
-            <h3 className="text-2xl font-bold text-center mt-4">User Review</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-                {comments.map((comment, index) => (
-                    <div key={index} className="p-4 border rounded-lg bg-gray-100 shadow-md">
-                        <div className="flex items-center gap-3">
-                            <img className="rounded-full object-cover w-12 h-12" alt={comment.user} src={comment.profile_img} />
-                            <p className="text-lg font-semibold">{comment.user}</p>
-                        </div>
-                        <p className="mt-2 text-gray-700">{comment.body}</p>
-                        <p className="text-sm text-gray-500 mt-1">
-                            {new Date(comment.created_on).toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true })}
-                        </p>
+            {/* comment display */}
+            <h3 className="text-2xl font-bold text-center mt-4">User Reviews</h3>
 
-                        {comment.user === loggedInUser && (
-                            <div className="flex gap-3 mt-3">
-                                <button className="btn btn-sm btn-accent" onClick={() => {
-                                    setEditingComment(comment.id);
-                                    setEditCommentText(comment.body);
-                                    document.getElementById("editModal").showModal();
-                                }}>Edit</button>
-
-                                <button className="btn btn-sm btn-error" onClick={() => handleDeleteComment(comment.id)}>Delete</button>
-                            </div>
-                        )}
+            {comments === null ? (
+                <div className="flex flex-col justify-center items-center pt-28">
+                    <p className="text-lg font-medium text-gray-700">No reviews found.</p>
+                </div>
+            ) : comments.length === 0 ? (
+                <div className="flex flex-col justify-center items-center pt-28">
+                    <div className="relative">
+                        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-primary border-opacity-50"></div>
+                        <div className="absolute top-0 left-0 h-16 w-16 border-t-4 border-primary rounded-full animate-spin-slow"></div>
                     </div>
-                ))}
-            </div>
+                    <p className="mt-4 text-lg font-medium text-gray-700 animate-pulse">Loading, please wait...</p>
+                </div>
+            ) : (
+                // Comments section
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+                    {comments.map((comment, index) => (
+                        <div key={index} className="p-4 border rounded-lg bg-gray-100 shadow-md">
+                            <div className="flex items-center gap-3">
+                                <img className="rounded-full object-cover w-12 h-12" alt={comment.user} src={comment.profile_img} />
+                                <p className="text-lg font-semibold">{comment.user}</p>
+                            </div>
+                            <p className="mt-2 text-gray-700">{comment.body}</p>
+                            <p className="text-sm text-gray-500 mt-1">
+                                {new Date(comment.created_on).toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true })}
+                            </p>
+
+                            {comment.user === loggedInUser && (
+                                <div className="flex gap-3 mt-3">
+                                    <button className="btn btn-sm btn-accent" onClick={() => {
+                                        setEditingComment(comment.id);
+                                        setEditCommentText(comment.body);
+                                        document.getElementById("editModal").showModal();
+                                    }}>Edit</button>
+
+                                    <button className="btn btn-sm btn-error" onClick={() => handleDeleteComment(comment.id)}>Delete</button>
+                                </div>
+                            )}
+                        </div>
+                    ))}
+                </div>
+            )}
 
             {/* Edit Comment Modal */}
             <dialog id="editModal" className="modal">
@@ -341,23 +382,11 @@ const Flower_Details = () => {
                     <textarea className="textarea textarea-bordered w-full mt-2" value={editCommentText} onChange={(e) => setEditCommentText(e.target.value)}></textarea>
                     <div className="modal-action">
                         <button className="btn btn-primary" onClick={() => handleEditComment(editingComment)}>Save</button>
-                        <button className="btn" onClick={() => document.getElementById("editModal").close()}>Close</button>
-                    </div>
-                </div>
-            </dialog>
-
-            {/* Only one Toaster component */}
-            <Toaster position="top-center" reverseOrder={false} />
-
-            {/* Order Modal */}
-            <dialog id="orderModal" className="modal">
-                <div className="modal-box">
-                    <h3 className="text-lg font-bold">Place Your Order</h3>
-                    <input type="number" className="input input-bordered w-full mt-2" value={quantity} onChange={(e) => setQuantity(e.target.value)} min="1"
-                    />
-                    <div className="modal-action">
-                        <button className="btn btn-primary" onClick={handleOrder}>Order</button>
-                        <button className="btn" onClick={() => document.getElementById("orderModal").close()}>Close</button>
+                        <button className="btn" onClick={() => {
+                            document.getElementById("editModal").close();
+                            setEditingComment(null);
+                            setEditCommentText("");
+                        }}>Close</button>
                     </div>
                 </div>
             </dialog>

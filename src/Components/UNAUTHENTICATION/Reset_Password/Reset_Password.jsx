@@ -26,7 +26,7 @@ const Reset_Password = () => {
 
         setLoading(true);
         try {
-            const response = await fetch(`${baseUrl}/pass_change/reset_password/${uid64}/${token}`, {
+            const response = await fetch(`${baseUrl}/pass_change/reset_password/${uid64}/${token}/`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
