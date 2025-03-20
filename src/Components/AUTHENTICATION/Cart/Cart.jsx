@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { toast } from "react-hot-toast";
 import { baseUrl } from "../../../constants/env.constants";
+import Loader from "../../../ConstData/Loader";
+import Time from "../../../ConstData/Time";
 
 const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -94,10 +96,7 @@ const Cart = () => {
         </h2>
 
         {loading ? (
-          <div className="flex flex-col justify-center items-center pt-10">
-            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
-            <p className="mt-4 text-lg text-gray-700">Loading...</p>
-          </div>
+          <Loader />
         ) : (
           <>
             <p className="text-center text-lg font-semibold mb-5 text-gray-600">
@@ -129,6 +128,7 @@ const Cart = () => {
                       </th>
                       <th className="px-2 py-2 whitespace-nowrap">Stock</th>
                       <th className="px-2 py-2 whitespace-nowrap">Category</th>
+                      <th className="px-2 py-2 whitespace-nowrap">Cart Add Time</th>
                       <th className="px-2 py-2 whitespace-nowrap">Action</th>
                     </tr>
                   </thead>
@@ -170,6 +170,9 @@ const Cart = () => {
                         </td>
                         <td className="px-2 py-3 whitespace-nowrap">
                           {item.flower_category}
+                        </td>
+                        <td className="px-2 py-3 whitespace-nowrap">
+                          {Time (item.added_at)}
                         </td>
                         <td className="px-2 py-3 whitespace-nowrap">
                           <a

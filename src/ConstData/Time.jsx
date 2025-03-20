@@ -1,9 +1,4 @@
-// eslint-disable-next-line no-unused-vars
-const formatDate = (date) => {
-    return new Date(date).toLocaleDateString("en-US");
-};
-
-export const longFormatDate = (dateString) => {
+const Time = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleString("en-US", {
         year: "numeric",
@@ -16,4 +11,4 @@ export const longFormatDate = (dateString) => {
     });
 };
 
-export default longFormatDate;  
+export default Time;
