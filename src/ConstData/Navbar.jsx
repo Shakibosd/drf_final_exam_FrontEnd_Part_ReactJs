@@ -1,4 +1,4 @@
-import { ChevronDown, Menu, Moon, ShoppingCart, Sun, X } from "lucide-react";
+import { ChevronDown, Menu, ShoppingCart, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
@@ -11,7 +11,6 @@ const Navbar = () => {
   );
   const [isAdmin, setIsAdmin] = useState(false);
   const [showAdminDropdown, setShowAdminDropdown] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
   const navigate = useNavigate();
   const logoutModalRef = useRef(null);
 
@@ -52,14 +51,6 @@ const Navbar = () => {
     };
   }, []);
 
-  useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  }, [isDarkMode]);
-
   const token = localStorage.getItem("auth_token");
   const userName = localStorage.getItem("UserName");
 
@@ -87,10 +78,6 @@ const Navbar = () => {
     } catch (error) {
       toast.error(error.message || "Logout Error");
     }
-  };
-
-  const toggleDarkMode = () => {
-    setIsDarkMode(!isDarkMode);
   };
 
   return (
@@ -189,16 +176,6 @@ const Navbar = () => {
                   )}
                 </li>
               )}
-
-              {/* ✅ Dark Mode Toggle */}
-              <li>
-                <button
-                  onClick={toggleDarkMode}
-                  className="hover:text-primary block"
-                >
-                  {isDarkMode ? <Sun size={24} /> : <Moon size={24} />}
-                </button>
-              </li>
 
               <li>
                 <button
