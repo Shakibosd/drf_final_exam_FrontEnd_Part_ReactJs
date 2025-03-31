@@ -1,38 +1,42 @@
-import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { baseUrl } from "../../../constants/env.constants";
 import Loader from "../../../ConstData/Loader";
+import axios from "axios";
+import { useQuery } from "@tanstack/react-query";
 
 const User = () => {
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const token = localStorage.getItem("auth_token");
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      const token = localStorage.getItem("auth_token");
-      try {
-        const response = await fetch(`${baseUrl}/user/user_all/`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `token ${token}`,
-          },
-        });
-        const data = await response.json();
-        setUsers(data);
-      } catch (error) {
-        console.error("Error fetching users:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchUsers = async () => {
+    const { data } = await axios.get(`${baseUrl}/user/user_all/`, {
+      headers: {
+        Authorization: `token ${token}`,
+      },
+    });
+    return data;
+  };
 
-    fetchUsers();
-  }, []);
+  const {
+    data: users = [],
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["users"],
+    queryFn: fetchUsers,
+    enabled: !!token,
+  });
 
-  if (loading) {
+  if (isLoading) {
+    return <Loader />;
+  }
+
+  if (error) {
     return (
-     <Loader />
+      <div className="text-center pt-28">
+        <p className="text-red-500">
+          Error loading users: {error.message}
+        </p>
+      </div>
     );
   }
 

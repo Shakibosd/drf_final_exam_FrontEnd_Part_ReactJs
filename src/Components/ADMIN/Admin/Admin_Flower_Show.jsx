@@ -1,31 +1,66 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { Helmet } from "react-helmet-async";
 import { baseUrl } from "../../../constants/env.constants";
 import Loader from "../../../ConstData/Loader";
+import axios from "axios";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 const Admin_Flower_Show = () => {
-  const [posts, setPosts] = useState([]);
   const [editPost, setEditPost] = useState(null);
   const [deletePostId, setDeletePostId] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    fetchPosts();
-  }, []);
-
+  // Fetch all flowers
   const fetchPosts = async () => {
-    try {
-      const response = await fetch(`${baseUrl}/flower/flower_all/`);
-      const data = await response.json();
-      setPosts(data);
-    } catch (error) {
-      console.error("Error fetching posts:", error);
-    } finally {
-      setLoading(false);
-    }
+    const { data } = await axios.get(`${baseUrl}/flower/flower_all/`);
+    return data;
   };
+
+  const {
+    data: posts = [],
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["flowers"],
+    queryFn: fetchPosts,
+  });
+
+  // Delete flower mutation
+  const deleteMutation = useMutation({
+    mutationFn: async (postId) => {
+      await axios.delete(`${baseUrl}/flower/flower_detail/${postId}/`);
+    },
+    onSuccess: () => {
+      toast.success("Flower deleted successfully!");
+      queryClient.invalidateQueries(["flowers"]);
+      setShowDeleteModal(false);
+      setDeletePostId(null);
+    },
+    onError: () => {
+      toast.error("Failed to delete the flower");
+    },
+  });
+
+  // Update flower mutation
+  const updateMutation = useMutation({
+    mutationFn: async (updatedPost) => {
+      const { data } = await axios.put(
+        `${baseUrl}/flower/flower_detail/${updatedPost.id}/`,
+        updatedPost
+      );
+      return data;
+    },
+    onSuccess: () => {
+      toast.success("Flower updated successfully!");
+      queryClient.invalidateQueries(["flowers"]);
+      setEditPost(null);
+    },
+    onError: () => {
+      toast.error("Failed to update the flower");
+    },
+  });
 
   const handleEdit = (post) => {
     setEditPost(post);
@@ -36,58 +71,28 @@ const Admin_Flower_Show = () => {
     setShowDeleteModal(true);
   };
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
     if (deletePostId) {
-      try {
-        const response = await fetch(
-          `${baseUrl}/flower/flower_detail/${deletePostId}/`,
-          {
-            method: "DELETE",
-          }
-        );
-        if (response.ok) {
-          fetchPosts();
-          toast.success("Flower deleted successfully!");
-        } else {
-          toast.error("Failed to delete the post");
-        }
-      } catch (error) {
-        console.error("Error deleting post:", error);
-      } finally {
-        setShowDeleteModal(false);
-        setDeletePostId(null);
-      }
+      deleteMutation.mutate(deletePostId);
     }
   };
 
-  const handleUpdate = async (e) => {
+  const handleUpdate = (e) => {
     e.preventDefault();
-    try {
-      const response = await fetch(
-        `${baseUrl}/flower/flower_detail/${editPost.id}/`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(editPost),
-        }
-      );
-      if (response.ok) {
-        fetchPosts();
-        toast.success("Flower updated successfully!");
-        setEditPost(null);
-      } else {
-        toast.error("Failed to update the post");
-      }
-    } catch (error) {
-      console.error("Error updating post:", error);
+    if (editPost) {
+      updateMutation.mutate(editPost);
     }
   };
 
-  if (loading) {
+  if (isLoading) {
+    return <Loader />;
+  }
+
+  if (error) {
     return (
-      <Loader />
+      <div className="text-center pt-28">
+        <p className="text-red-500">Error loading flowers: {error.message}</p>
+      </div>
     );
   }
 
@@ -97,6 +102,7 @@ const Admin_Flower_Show = () => {
         <title>Admin Flower Show And Edit</title>
       </Helmet>
 
+      {/* Delete Confirmation Modal */}
       {showDeleteModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg">
@@ -107,11 +113,16 @@ const Admin_Flower_Show = () => {
               <button
                 onClick={() => setShowDeleteModal(false)}
                 className="btn btn-outline"
+                disabled={deleteMutation.isLoading}
               >
                 Cancel
               </button>
-              <button onClick={handleDelete} className="btn btn-error">
-                Delete
+              <button
+                onClick={handleDelete}
+                className="btn btn-error"
+                disabled={deleteMutation.isLoading}
+              >
+                {deleteMutation.isLoading ? "Deleting..." : "Delete"}
               </button>
             </div>
           </div>
@@ -120,9 +131,7 @@ const Admin_Flower_Show = () => {
 
       {/* Edit Form */}
       <div className="bg-white shadow-lg rounded-lg p-6 mb-8">
-        <h2 className="text-2xl font-bold mb-4 text-center">
-          Edit Flower Post
-        </h2>
+        <h2 className="text-2xl font-bold mb-4 text-center">Edit Flower Post</h2>
         {editPost && (
           <form
             onSubmit={handleUpdate}
@@ -130,9 +139,7 @@ const Admin_Flower_Show = () => {
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-gray-700 font-semibold">
-                  Title:
-                </label>
+                <label className="block text-gray-700 font-semibold">Title:</label>
                 <input
                   type="text"
                   value={editPost.title}
@@ -140,12 +147,11 @@ const Admin_Flower_Show = () => {
                     setEditPost({ ...editPost, title: e.target.value })
                   }
                   className="border p-2 w-full rounded-md"
+                  required
                 />
               </div>
               <div>
-                <label className="block text-gray-700 font-semibold">
-                  Category:
-                </label>
+                <label className="block text-gray-700 font-semibold">Category:</label>
                 <input
                   type="text"
                   value={editPost.category}
@@ -153,28 +159,26 @@ const Admin_Flower_Show = () => {
                     setEditPost({ ...editPost, category: e.target.value })
                   }
                   className="border p-2 w-full rounded-md"
+                  required
                 />
               </div>
             </div>
 
             <div className="mt-4">
-              <label className="block text-gray-700 font-semibold">
-                Description:
-              </label>
+              <label className="block text-gray-700 font-semibold">Description:</label>
               <textarea
                 value={editPost.description}
                 onChange={(e) =>
                   setEditPost({ ...editPost, description: e.target.value })
                 }
                 className="border p-2 w-full rounded-md"
+                required
               ></textarea>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
               <div>
-                <label className="block text-gray-700 font-semibold">
-                  Price:
-                </label>
+                <label className="block text-gray-700 font-semibold">Price:</label>
                 <input
                   type="number"
                   value={editPost.price}
@@ -182,12 +186,12 @@ const Admin_Flower_Show = () => {
                     setEditPost({ ...editPost, price: e.target.value })
                   }
                   className="border p-2 w-full rounded-md"
+                  required
+                  min="0"
                 />
               </div>
               <div>
-                <label className="block text-gray-700 font-semibold">
-                  Stock:
-                </label>
+                <label className="block text-gray-700 font-semibold">Stock:</label>
                 <input
                   type="number"
                   value={editPost.stock}
@@ -195,14 +199,14 @@ const Admin_Flower_Show = () => {
                     setEditPost({ ...editPost, stock: e.target.value })
                   }
                   className="border p-2 w-full rounded-md"
+                  required
+                  min="0"
                 />
               </div>
             </div>
 
             <div className="mt-4">
-              <label className="block text-gray-700 font-semibold">
-                Image:
-              </label>
+              <label className="block text-gray-700 font-semibold">Image:</label>
               <input
                 type="file"
                 onChange={(e) =>
@@ -214,9 +218,10 @@ const Admin_Flower_Show = () => {
 
             <button
               type="submit"
-              className="bg-blue-500 text-white px-6 py-2 mt-4 w-full rounded-md font-semibold hover:bg-blue-600 transition"
+              className="bg-blue-500 text-white px-6 py-2 mt-4 w-full rounded-md font-semibold hover:bg-blue-600 transition disabled:bg-blue-300"
+              disabled={updateMutation.isLoading}
             >
-              Update Post
+              {updateMutation.isLoading ? "Updating..." : "Update Post"}
             </button>
           </form>
         )}

@@ -1,73 +1,72 @@
-import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { baseUrl } from "../../../constants/env.constants";
 import Loader from "../../../ConstData/Loader";
 import Time from "../../../ConstData/Time";
+import axios from "axios";
+import { useQuery } from "@tanstack/react-query";
 
 const Order_History_Admin = () => {
-  const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState(null);
   const token = localStorage.getItem("auth_token");
 
-  useEffect(() => {
-    if (!token) {
-      console.error("No auth token found.");
-      setLoading(false);
-      return;
-    }
+  // Fetch all orders
+  const fetchOrders = async () => {
+    const { data } = await axios.get(`${baseUrl}/order/all_order/`, {
+      headers: {
+        Authorization: `token ${token}`,
+      },
+    });
+    return data;
+  };
 
-    const fetchOrders = async () => {
-      try {
-        const response = await fetch(`${baseUrl}/order/all_order/`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `token ${token}`,
-          },
-        });
+  const {
+    data: orders = [],
+    isLoading: ordersLoading,
+    error: ordersError,
+  } = useQuery({
+    queryKey: ["adminOrders"],
+    queryFn: fetchOrders,
+    enabled: !!token,
+  });
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
+  // Fetch order statistics
+  const fetchStats = async () => {
+    const { data } = await axios.get(`${baseUrl}/order/user_order_stats/`, {
+      headers: {
+        Authorization: `token ${token}`,
+      },
+    });
+    return data;
+  };
 
-        const data = await response.json();
-        setOrders(data);
-      } catch (error) {
-        console.error("Error fetching order history:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const {
+    data: stats,
+    isLoading: statsLoading,
+    error: statsError,
+  } = useQuery({
+    queryKey: ["orderStats"],
+    queryFn: fetchStats,
+    enabled: !!token,
+  });
 
-    const fetchStats = async () => {
-      try {
-        const response = await fetch(`${baseUrl}/order/user_order_stats/`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `token ${token}`,
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        setStats(data);
-      } catch (error) {
-        console.error("Error fetching order stats:", error);
-      }
-    };
-
-    fetchOrders();
-    fetchStats();
-  }, [token]);
-
-  if (loading) {
+  if (!token) {
     return (
-      <Loader />
+      <div className="text-center pt-28">
+        <p className="text-red-500">Authentication required. Please log in.</p>
+      </div>
+    );
+  }
+
+  if (ordersLoading || statsLoading) {
+    return <Loader />;
+  }
+
+  if (ordersError || statsError) {
+    return (
+      <div className="text-center pt-28">
+        <p className="text-red-500">
+          Error loading data: {ordersError?.message || statsError?.message}
+        </p>
+      </div>
     );
   }
 
@@ -172,7 +171,7 @@ const Order_History_Admin = () => {
                     {order.status}
                   </td>
                   <td className="border border-gray-300 px-4 py-2 whitespace-nowrap">
-                    {Time (order.order_date)}
+                    {Time(order.order_date)}
                   </td>
                   <td className="border border-gray-300 px-4 py-2 whitespace-nowrap">
                     {order.transaction_id || "N/A"}

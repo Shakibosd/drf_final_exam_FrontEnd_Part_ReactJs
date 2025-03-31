@@ -4,23 +4,22 @@ import { toast } from "react-hot-toast";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { baseUrl } from "../../../constants/env.constants";
 import Loader from "../../../ConstData/Loader";
+import axios from "axios";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 const Flower_Details = () => {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const id = params.get("flower_id");
-  const [flower, setFlower] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
-  const [canComment, setCanComment] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [editingComment, setEditingComment] = useState(null);
   const [editCommentText, setEditCommentText] = useState("");
   const navigate = useNavigate();
   const [loggedInUser, setLoggedInUser] = useState("");
+  const queryClient = useQueryClient();
 
+  // Initialize user data
   useEffect(() => {
     const user = localStorage.getItem("UserName");
     if (user) {
@@ -28,291 +27,247 @@ const Flower_Details = () => {
     }
   }, []);
 
-  useEffect(() => {
-    if (!id) return;
+  // Fetch flower details
+  const fetchFlowerDetails = async () => {
+    const { data } = await axios.get(`${baseUrl}/flower/flower_detail/${id}/`);
+    return data;
+  };
 
-    const fetchFlowerDetails = async () => {
-      try {
-        const response = await fetch(`${baseUrl}/flower/flower_detail/${id}/`);
-        if (!response.ok) {
-          throw new Error("Flower not found!");
-        }
-        const data = await response.json();
-        setFlower(data);
-      } catch (error) {
-        console.error("Error fetching flower details:", error);
-        setFlower(null);
-      } finally {
-        setLoading(false);
+  const {
+    data: flower,
+    isLoading: flowerLoading,
+    error: flowerError,
+  } = useQuery({
+    queryKey: ["flower", id],
+    queryFn: fetchFlowerDetails,
+    enabled: !!id,
+  });
+
+  // Check order status
+  const checkOrderStatus = async () => {
+    const token = localStorage.getItem("auth_token");
+    const { data } = await axios.get(
+      `${baseUrl}/flower/comment_check_order/?flower_id=${id}`,
+      {
+        headers: {
+          Authorization: `token ${token}`,
+        },
       }
-    };
+    );
+    return data.can_comment;
+  };
 
-    // Check order status
-    const checkOrder = async () => {
+  const { data: canComment } = useQuery({
+    queryKey: ["canComment", id],
+    queryFn: checkOrderStatus,
+    enabled: !!id && !!loggedInUser,
+  });
+
+  // Fetch comments
+  const fetchComments = async () => {
+    const token = localStorage.getItem("auth_token");
+    const { data } = await axios.get(
+      `${baseUrl}/flower/comment_show/${id}/`,
+      {
+        headers: {
+          Authorization: `token ${token}`,
+        },
+      }
+    );
+    return data;
+  };
+
+  const {
+    data: comments = [],
+    isLoading: commentsLoading,
+    refetch: refetchComments,
+  } = useQuery({
+    queryKey: ["comments", id],
+    queryFn: fetchComments,
+    enabled: !!id,
+  });
+
+  // Comment mutations
+  const addCommentMutation = useMutation({
+    mutationFn: async (commentData) => {
       const token = localStorage.getItem("auth_token");
-
-      try {
-        const response = await fetch(
-          `${baseUrl}/flower/comment_check_order/?flower_id=${id}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `token ${token}`,
-            },
-          }
-        );
-        const data = await response.json();
-        console.log("Order check response:", data);
-        setCanComment(data.can_comment);
-      } catch (error) {
-        console.error("Error checking order status:", error);
-      }
-    };
-
-    // Fetch comments
-    const fetchComments = async () => {
-      try {
-        const token = localStorage.getItem("auth_token");
-        const response = await fetch(`${baseUrl}/flower/comment_show/${id}/`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `token ${token}`,
-          },
-        });
-        const data = await response.json();
-        setComments(data);
-      } catch (error) {
-        console.error("Error fetching comments:", error);
-      }
-    };
-
-    fetchFlowerDetails();
-    checkOrder();
-    fetchComments();
-  }, [id]);
-
-  //comment post submit
-  const handleCommentSubmit = async () => {
-    if (!canComment) {
-      toast.error("❌ You must order this flower to comment!");
-      return;
-    }
-
-    const token = localStorage.getItem("auth_token");
-    try {
-      const response = await fetch(`${baseUrl}/flower/comment_all/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `token ${token}`,
-        },
-        body: JSON.stringify({ flower: id, body: newComment }),
-      });
-
-      if (response.ok) {
-        const responseData = await response.json();
-        console.log(responseData);
-        toast.success("✅ Comment added successfully!");
-        setNewComment("");
-
-        setComments((prevComments) => [...prevComments, responseData]);
-      } else {
-        const errorData = await response.json();
-        console.error("Error response:", errorData);
-        toast.error("❌ Failed to add comment!");
-      }
-    } catch (error) {
-      toast.error("🚨 Network error. Please try again.");
-      console.error("Error submitting comment:", error);
-    }
-  };
-
-  //flower order
-  const handleOrder = async () => {
-    const token = localStorage.getItem("auth_token");
-    if (!flower) {
-      toast.error("❌ Flower data not found!");
-      return;
-    }
-
-    try {
-      const response = await fetch(`${baseUrl}/order/create_order/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `token ${token}`,
-        },
-        body: JSON.stringify({
-          flower: flower.id,
-          quantity: parseInt(quantity),
-        }),
-      });
-
-      if (response.ok) {
-        toast.success("✅ Order placed successfully! Please Check Your Email.");
-        navigate("/order_history");
-        document.getElementById("orderModal").close();
-        window.dispatchEvent(new Event("orderUpdated"));
-      } else {
-        const data = await response.json();
-        toast.error(`❌ Failed: ${data.message || "Try again!"}`);
-      }
-    } catch (error) {
-      toast.error("🚨 Network error. Please try again.");
-      console.error("Error placing order:", error);
-    }
-  };
-
-  //payment
-  const handlePayment = async () => {
-    const token = localStorage.getItem("auth_token");
-
-    if (!flower) {
-      toast.error("❌ Flower data not found!");
-      return;
-    }
-
-    console.log("Flower Id -> ", id);
-
-    try {
-      const checkOrderResponse = await fetch(
-        `${baseUrl}/flower/comment_check_order/?flower_id=${id}`,
+      const { data } = await axios.post(
+        `${baseUrl}/flower/comment_all/`,
+        commentData,
         {
-          method: "GET",
           headers: {
-            "Content-Type": "application/json",
             Authorization: `token ${token}`,
           },
         }
       );
+      return data;
+    },
+    onSuccess: () => {
+      toast.success("✅ Comment added successfully!");
+      setNewComment("");
+      refetchComments();
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message || "❌ Failed to add comment!");
+    },
+  });
 
-      const orderData = await checkOrderResponse.json();
+  const editCommentMutation = useMutation({
+    mutationFn: async ({ commentId, commentData }) => {
+      const token = localStorage.getItem("auth_token");
+      const { data } = await axios.put(
+        `${baseUrl}/flower/comment_edit/${commentId}/`,
+        commentData,
+        {
+          headers: {
+            Authorization: `token ${token}`,
+          },
+        }
+      );
+      return data;
+    },
+    onSuccess: () => {
+      toast.success("✅ Comment updated successfully!");
+      document.getElementById("editModal").close();
+      setEditingComment(null);
+      setEditCommentText("");
+      refetchComments();
+    },
+    onError: (error) => {
+      toast.error(
+        error.response?.data?.message || "❌ Failed to update comment!"
+      );
+    },
+  });
+
+  const deleteCommentMutation = useMutation({
+    mutationFn: async (commentId) => {
+      const token = localStorage.getItem("auth_token");
+      await axios.delete(`${baseUrl}/flower/comment_delete/${commentId}/`, {
+        headers: {
+          Authorization: `token ${token}`,
+        },
+      });
+    },
+    onSuccess: () => {
+      toast.success("✅ Comment deleted successfully!");
+      refetchComments();
+    },
+    onError: (error) => {
+      toast.error(
+        error.response?.data?.message || "❌ Failed to delete comment!"
+      );
+    },
+  });
+
+  // Order mutations
+  const createOrderMutation = useMutation({
+    mutationFn: async (orderData) => {
+      const token = localStorage.getItem("auth_token");
+      const { data } = await axios.post(
+        `${baseUrl}/order/create_order/`,
+        orderData,
+        {
+          headers: {
+            Authorization: `token ${token}`,
+          },
+        }
+      );
+      return data;
+    },
+    onSuccess: () => {
+      toast.success("✅ Order placed successfully! Please Check Your Email.");
+      navigate("/order_history");
+      document.getElementById("orderModal").close();
+      window.dispatchEvent(new Event("orderUpdated"));
+      queryClient.invalidateQueries(["canComment"]);
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message || "❌ Failed to place order!");
+    },
+  });
+
+  // Payment handler
+  const handlePayment = async () => {
+    const token = localStorage.getItem("auth_token");
+
+    try {
+      // First check if user has ordered the flower
+      const { data: orderData } = await axios.get(
+        `${baseUrl}/flower/comment_check_order/?flower_id=${id}`,
+        {
+          headers: {
+            Authorization: `token ${token}`,
+          },
+        }
+      );
 
       if (!orderData.can_comment) {
         toast.error("❌ You must order this flower before making a payment!");
         return;
       }
 
-      const paymentResponse = await fetch(
+      // Proceed with payment
+      const { data: paymentData } = await axios.get(
         `${baseUrl}/payments/payment_detail/${id}/`,
         {
-          method: "GET",
           headers: {
-            "Content-Type": "application/json",
             Authorization: `token ${token}`,
           },
         }
       );
 
-      if (paymentResponse.ok) {
-        const paymentData = await paymentResponse.json();
-        console.log("Redirecting to:", paymentData.redirect_url);
-        window.location.href = paymentData.redirect_url;
-      } else {
-        const errorData = await paymentResponse.json();
-        toast.error(`❌ Payment failed: ${errorData.message || "Try again!"}`);
-      }
+      window.location.href = paymentData.redirect_url;
     } catch (error) {
-      toast.error("🚨 Network error. Please try again.");
-      console.error("Error processing payment:", error);
-    }
-  };
-
-  // Edit comment
-  const handleEditComment = async (commentId) => {
-    const token = localStorage.getItem("auth_token");
-    try {
-      const response = await fetch(
-        `${baseUrl}/flower/comment_edit/${commentId}/`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `token ${token}`,
-          },
-          body: JSON.stringify({ body: editCommentText }),
-        }
+      toast.error(
+        error.response?.data?.message || "🚨 Network error. Please try again."
       );
-
-      if (response.ok) {
-        toast.success("✅ Comment updated successfully!");
-        setComments((prevComments) =>
-          prevComments.map((comment) =>
-            comment.id === commentId
-              ? { ...comment, body: editCommentText }
-              : comment
-          )
-        );
-        document.getElementById("editModal").close();
-        setEditingComment(null);
-        setEditCommentText("");
-      } else {
-        const errorData = await response.json();
-        toast.error(
-          `❌ Failed to update comment: ${errorData.message || "Try again!"}`
-        );
-      }
-    } catch (error) {
-      toast.error("🚨 Network error. Please try again.");
-      console.error("Error updating comment:", error);
     }
   };
 
-  // Delete comment
-  const handleDeleteComment = async (commentId) => {
-    const token = localStorage.getItem("auth_token");
-
-    if (!token) {
-      toast.error("🚨 Authentication failed! Please log in.");
+  // Comment handlers
+  const handleCommentSubmit = () => {
+    if (!canComment) {
+      toast.error("❌ You must order this flower to comment!");
       return;
     }
-
-    try {
-      const response = await fetch(
-        `${baseUrl}/flower/comment_delete/${commentId}/`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `token ${token}`,
-          },
-        }
-      );
-
-      if (response.ok) {
-        toast.success("✅ Comment deleted successfully!");
-        setComments((prevComments) =>
-          prevComments.filter((comment) => comment.id !== commentId)
-        );
-      } else {
-        const errorData = await response.json();
-        toast.error(
-          `❌ Failed to delete comment: ${errorData.message || "Try again!"}`
-        );
-      }
-    } catch (error) {
-      toast.error("🚨 Network error. Please try again.");
-      console.error("Error deleting comment:", error);
-    }
+    addCommentMutation.mutate({ flower: id, body: newComment });
   };
 
-  if (loading) return <Loader />;
+  const handleEditComment = (commentId) => {
+    editCommentMutation.mutate({
+      commentId,
+      commentData: { body: editCommentText },
+    });
+  };
+
+  const handleDeleteComment = (commentId) => {
+    deleteCommentMutation.mutate(commentId);
+  };
+
+  const handleOrder = () => {
+    if (!flower) {
+      toast.error("❌ Flower data not found!");
+      return;
+    }
+    createOrderMutation.mutate({
+      flower: flower.id,
+      quantity: parseInt(quantity),
+    });
+  };
+
+  if (flowerLoading) return <Loader />;
+  if (flowerError) return <p className="text-center text-red-500">Flower not found!</p>;
 
   return (
     <div className="container mx-auto max-w-screen-xl px-6 py-3 pt-28">
       <Helmet>
         <title>Flower Details</title>
       </Helmet>
-      {flower ? (
+      {flower && (
         <div className="bg-white shadow-md rounded-lg overflow-hidden">
           <figure>
-            <img
-              src={flower.image}
-              alt={flower.title}
-              className="w-full h-72"
-            />
+            <img src={flower.image} alt={flower.title} className="w-full h-72 object-cover" />
           </figure>
 
           <div className="p-6">
@@ -334,15 +289,11 @@ const Flower_Details = () => {
               <Link to={"/auth_home"} className="btn btn-primary w-full">
                 Back
               </Link>
-              <button
-                className="btn btn-secondary w-full"
-                onClick={() =>
-                  document.getElementById("orderModal").showModal()
-                }
-              >
-                Order Now
+              <button className="btn btn-secondary w-full" onClick={() =>
+                document.getElementById("orderModal").showModal()} disabled={createOrderMutation.isPending}>
+                {createOrderMutation.isPending ? "Ordering..." : "Order Now"}
               </button>
-              <button className="btn btn-accent w-full" onClick={handlePayment}>
+              <button className="btn btn-accent w-full" onClick={handlePayment} disabled={!canComment}>
                 Payment
               </button>
               <button
@@ -368,12 +319,14 @@ const Flower_Details = () => {
                 placeholder="Your comment..."
                 onChange={(e) => setNewComment(e.target.value)}
                 value={newComment}
+                disabled={addCommentMutation.isPending}
               ></textarea>
               <button
                 className="btn btn-success mt-2"
                 onClick={handleCommentSubmit}
+                disabled={addCommentMutation.isPending}
               >
-                Submit Comment
+                {addCommentMutation.isPending ? "Submitting..." : "Submit Comment"}
               </button>
             </div>
 
@@ -389,8 +342,12 @@ const Flower_Details = () => {
                   min="1"
                 />
                 <div className="modal-action">
-                  <button className="btn btn-primary" onClick={handleOrder}>
-                    Order
+                  <button
+                    className="btn btn-primary"
+                    onClick={handleOrder}
+                    disabled={createOrderMutation.isPending}
+                  >
+                    {createOrderMutation.isPending ? "Ordering..." : "Order"}
                   </button>
                   <button
                     className="btn"
@@ -405,33 +362,22 @@ const Flower_Details = () => {
             </dialog>
           </div>
         </div>
-      ) : (
-        <p className="text-center text-red-500">Flower not found!</p>
       )}
 
       {/* comment display */}
       <h3 className="text-2xl font-bold text-center mt-4">User Reviews</h3>
 
-      {comments === null ? (
+      {commentsLoading ? (
+        <Loader />
+      ) : comments.length === 0 ? (
         <div className="flex flex-col justify-center items-center pt-28">
           <p className="text-lg font-medium text-gray-700">No reviews found.</p>
         </div>
-      ) : comments.length === 0 ? (
-        <div className="flex flex-col justify-center items-center pt-28">
-          <div className="relative">
-            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-primary border-opacity-50"></div>
-            <div className="absolute top-0 left-0 h-16 w-16 border-t-4 border-primary rounded-full animate-spin-slow"></div>
-          </div>
-          <p className="mt-4 text-lg font-medium text-gray-700 animate-pulse">
-            Loading, please wait...
-          </p>
-        </div>
       ) : (
-        // Comments section
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-          {comments.map((comment, index) => (
+          {comments.map((comment) => (
             <div
-              key={index}
+              key={comment.id}
               className="p-4 border rounded-lg bg-gray-100 shadow-md"
             >
               <div className="flex items-center gap-3">
@@ -461,6 +407,7 @@ const Flower_Details = () => {
                       setEditCommentText(comment.body);
                       document.getElementById("editModal").showModal();
                     }}
+                    disabled={editCommentMutation.isPending}
                   >
                     Edit
                   </button>
@@ -468,6 +415,7 @@ const Flower_Details = () => {
                   <button
                     className="btn btn-sm btn-error"
                     onClick={() => handleDeleteComment(comment.id)}
+                    disabled={deleteCommentMutation.isPending}
                   >
                     Delete
                   </button>
@@ -486,13 +434,15 @@ const Flower_Details = () => {
             className="textarea textarea-bordered w-full mt-2"
             value={editCommentText}
             onChange={(e) => setEditCommentText(e.target.value)}
+            disabled={editCommentMutation.isPending}
           ></textarea>
           <div className="modal-action">
             <button
               className="btn btn-primary"
               onClick={() => handleEditComment(editingComment)}
+              disabled={editCommentMutation.isPending}
             >
-              Save
+              {editCommentMutation.isPending ? "Saving..." : "Save"}
             </button>
             <button
               className="btn"

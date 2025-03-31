@@ -3,17 +3,14 @@ import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import { baseUrl } from "../../../constants/env.constants";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import axios from "axios";
 import Loader from "../../../ConstData/Loader";
+import { baseUrl } from "../../../constants/env.constants";
 
 const Auth_Home = () => {
-  const [flowersLoading, setFlowersLoading] = useState(true);
-  const [, setError] = useState(null);
-  const [flowers, setFlowers] = useState([]);
   const [selectedFilter, setSelectedFilter] = useState("all");
   const [filteredFlowers, setFilteredFlowers] = useState([]);
-  const [careTips, setCareTips] = useState([]);
-
   const navigate = useNavigate();
 
   // Slide Section Data
@@ -105,29 +102,80 @@ const Auth_Home = () => {
     "Queen Anne’s",
   ];
 
-  useEffect(() => {
-    fetch(`${baseUrl}/flower/flower_all/`)
-      .then((res) => res.json())
-      .then((data) => {
-        setFlowers(data);
-        setFilteredFlowers(data);
-        setFlowersLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-        setError("Failed to fetch flowers");
-        setFlowersLoading(false);
-      });
+  // Fetch flowers
+  const fetchFlowers = async () => {
+    const response = await axios.get(`${baseUrl}/flower/flower_all/`);
+    return response.data;
+  };
 
-    fetch(`${baseUrl}/flower/care_tips/`)
-      .then((res) => res.json())
-      .then((data) => setCareTips(data))
-      .catch((err) => {
-        console.error("Error fetching care tips:", err);
-        setError("Failed to fetch care tips");
-      });
-  }, []);
+  // Fetch care tips
+  const fetchCareTips = async () => {
+    const response = await axios.get(`${baseUrl}/flower/care_tips/`);
+    return response.data;
+  };
 
+  const {
+    data: flowers,
+    isLoading: flowersLoading,
+    isError: flowersError,
+  } = useQuery({
+    queryKey: ["flowers"],
+    queryFn: fetchFlowers,
+    onError: () => {
+      toast.error("Failed to fetch flowers");
+    },
+  });
+
+  const {
+    data: careTips,
+    isLoading: careTipsLoading,
+    isError: careTipsError,
+  } = useQuery({
+    queryKey: ["careTips"],
+    queryFn: fetchCareTips,
+    onError: () => {
+      toast.error("Failed to fetch care tips");
+    },
+  });
+
+  // Add to cart mutation
+  const addToCartMutation = useMutation({
+    mutationFn: async (flower) => {
+      const token = localStorage.getItem("auth_token");
+      const response = await axios.post(
+        `${baseUrl}/flower/cart/`,
+        {
+          flower: flower.id,
+          title: flower.title,
+          price: flower.price,
+          description: flower.description,
+          stock: flower.stock,
+          category: flower.category,
+          image: flower.image,
+          quantity: 1,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `token ${token}`,
+          },
+        }
+      );
+      return response.data;
+    },
+    onSuccess: () => {
+      toast.success("Flower added to cart successfully!");
+      navigate("/cart");
+    },
+    onError: (error) => {
+      console.error("Error adding to cart:", error);
+      toast.error(
+        error.response?.data?.message || "Product Already Added to Your Cart!"
+      );
+    },
+  });
+
+  // Handle filter click
   const handleFilterClick = (filter) => {
     setSelectedFilter(filter.toLowerCase());
     if (filter === "All") {
@@ -141,41 +189,24 @@ const Auth_Home = () => {
     }
   };
 
-  const handleAddToCart = async (flower_id) => {
-    const token = localStorage.getItem("auth_token");
-    try {
-      const response = await fetch(`${baseUrl}/flower/cart/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `token ${token}`,
-        },
-        body: JSON.stringify({
-          flower: flower_id.id,
-          title: flower_id.title,
-          price: flower_id.price,
-          description: flower_id.description,
-          stock: flower_id.stock,
-          category: flower_id.category,
-          image: flower_id.image,
-          quantity: 1,
-        }),
-      });
-
-      const data = await response.json();
-      console.log(data);
-
-      if (response.ok) {
-        toast.success("Flower added to cart successfully!");
-        navigate("/cart");
-      } else {
-        toast.error("Product Already Added to Your Cart!");
-      }
-    } catch (error) {
-      console.error("Error adding to cart:", error);
-      toast.error("Something went wrong!");
-    }
+  // Handle add to cart
+  const handleAddToCart = (flower) => {
+    addToCartMutation.mutate(flower);
   };
+
+  useEffect(() => {
+    if (flowers) {
+      setFilteredFlowers(flowers);
+    }
+  }, [flowers]);
+
+  if (flowersLoading || careTipsLoading) {
+    return <Loader />;
+  }
+
+  if (flowersError || careTipsError) {
+    return <p className="text-center text-red-500">Error loading data.</p>;
+  }
 
   return (
     <>
@@ -301,7 +332,7 @@ const Auth_Home = () => {
               Learn how to take care of your flowers with expert tips.
             </p>
 
-            {flowersLoading ? (
+            {careTipsLoading ? (
               <Loader />
             ) : (
               <div style={{ lineHeight: "30px" }}>
