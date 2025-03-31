@@ -296,14 +296,8 @@ const Flower_Details = () => {
               <button className="btn btn-accent w-full" onClick={handlePayment} disabled={!canComment}>
                 Payment
               </button>
-              <button
-                className="btn btn-warning w-full"
-                onClick={() =>
-                  document
-                    .getElementById("commentSection")
-                    .classList.toggle("hidden")
-                }
-              >
+              <button className="btn btn-warning w-full" onClick={() =>
+                document.getElementById("commentSection").classList.toggle("hidden")}>
                 Comment
               </button>
             </div>
