@@ -14,7 +14,6 @@ const Cart = () => {
   const [showFullDescription, setShowFullDescription] = useState({});
   const [deleteItemId, setDeleteItemId] = useState(null);
 
-  // Fetch cart items
   const fetchCartItems = async () => {
     const response = await axios.get(`${baseUrl}/flower/cart/`, {
       headers: {
@@ -44,7 +43,6 @@ const Cart = () => {
     },
   });
 
-  // Remove item from cart mutation
   const removeFromCartMutation = useMutation({
     mutationFn: async (id) => {
       const response = await axios.delete(
