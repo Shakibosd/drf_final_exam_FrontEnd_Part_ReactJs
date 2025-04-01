@@ -18,10 +18,10 @@ import Contact from "./Components/UNAUTHENTICATION/Contact/Contact";
 import Home from './Components/UNAUTHENTICATION/Home/Home';
 import Hr_Login from "./Components/UNAUTHENTICATION/Hr_Login/Hr_Login";
 import Login from "./Components/UNAUTHENTICATION/Login/Login";
-import OTP from "./Components/UNAUTHENTICATION/OTP/otp";
 import Password_Reset from "./Components/UNAUTHENTICATION/Password_Reset/Password_Reset";
 import Register from "./Components/UNAUTHENTICATION/Register/Register";
 import Reset_Password from "./Components/UNAUTHENTICATION/Reset_Password/Reset_Password";
+import OTP from "./Components/UNAUTHENTICATION/OTP/OTP";
 
 // ✅ QueryClient তৈরি করো
 const queryClient = new QueryClient();
