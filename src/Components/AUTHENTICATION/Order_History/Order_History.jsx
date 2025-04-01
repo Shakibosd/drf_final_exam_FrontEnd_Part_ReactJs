@@ -10,7 +10,6 @@ import { baseUrl } from "../../../constants/env.constants";
 const OrderHistory = () => {
   const token = localStorage.getItem("auth_token");
 
-  // Fetch orders
   const fetchOrders = async () => {
     const response = await axios.get(`${baseUrl}/order/my_order/`, {
       headers: {
@@ -21,7 +20,6 @@ const OrderHistory = () => {
     return response.data;
   };
 
-  // Fetch stats
   const fetchStats = async () => {
     const response = await axios.get(`${baseUrl}/order/one_user_order_stats/`, {
       headers: {
@@ -32,16 +30,15 @@ const OrderHistory = () => {
     return response.data;
   };
 
-  // UseQuery for orders
   const {
     data: orders,
     isLoading: ordersLoading,
     isError: ordersError,
     refetch: refetchOrders,
   } = useQuery({
-    queryKey: ["orders"], // Query key as an array
-    queryFn: fetchOrders, // Query function
-    enabled: !!token, // Only fetch if token exists
+    queryKey: ["orders"],
+    queryFn: fetchOrders, 
+    enabled: !!token, 
     onError: () => {
       toast.error("❌ Network error. Try again.");
     },
@@ -52,21 +49,19 @@ const OrderHistory = () => {
     },
   });
 
-  // UseQuery for stats
   const {
     data: stats,
     isLoading: statsLoading,
     isError: statsError,
   } = useQuery({
-    queryKey: ["stats"], // Query key as an array
-    queryFn: fetchStats, // Query function
-    enabled: !!token, // Only fetch if token exists
+    queryKey: ["stats"], 
+    queryFn: fetchStats, 
+    enabled: !!token, 
     onError: () => {
       console.error("Error fetching order stats");
     },
   });
 
-  // Add event listener for order updates
   useEffect(() => {
     window.addEventListener("orderUpdated", refetchOrders);
 
@@ -75,12 +70,10 @@ const OrderHistory = () => {
     };
   }, [refetchOrders]);
 
-  // Show loader while data is being fetched
   if (ordersLoading || statsLoading) {
     return <Loader />;
   }
 
-  // Show error message if there's an error
   if (ordersError || statsError) {
     return (
       <p className="text-center text-gray-600 pt-10">
@@ -89,7 +82,6 @@ const OrderHistory = () => {
     );
   }
 
-  // Show message if no stats are available
   if (!stats) {
     return (
       <p className="text-center text-gray-600 pt-10">

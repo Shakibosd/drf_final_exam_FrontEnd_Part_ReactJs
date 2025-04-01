@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { toast } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 import { baseUrl } from "../../../constants/env.constants";
 
 const OTP = () => {
@@ -10,6 +11,7 @@ const OTP = () => {
   const [resendDisabled, setResendDisabled] = useState(false);
   const [timer, setTimer] = useState(0);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     let interval;
@@ -46,6 +48,7 @@ const OTP = () => {
       setLoading(false);
       if (response.ok) {
         toast.success("OTP Verified Successfully!");
+        navigate('/login');
       } else {
         toast.error(data.message || "Invalid OTP. Please try again.");
       }

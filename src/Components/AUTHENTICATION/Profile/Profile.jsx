@@ -1,7 +1,7 @@
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
 import { Helmet } from "react-helmet-async";
 import { toast } from "react-hot-toast";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
 import Loader from "../../../ConstData/Loader";
 import { baseUrl } from "../../../constants/env.constants";
 
@@ -141,14 +141,16 @@ const Profile = () => {
             >
               <div className="flex flex-col items-center">
                 <img
-                  key={profile.profile_img}
-                  src={`${profile.profile_img}?t=${new Date().getTime()}`}
+                  src={
+                    profile.profile_img ||
+                    "https://via.placeholder.com/150"
+                  }
                   alt="Profile"
-                  className="w-60 h-60 object-cover rounded-full mx-auto"
+                  className="w-52 h-52 rounded-full object-cover border-4 border-white shadow-lg"
                 />
                 <button
                   type="button"
-                  className="btn btn-sm btn-outline mt-2"
+                  className="mt-3 px-4 py-2 bg-blue-100 text-blue-600 rounded-lg"
                   onClick={() => document.getElementById("fileInput").click()}
                 >
                   Change Photo
