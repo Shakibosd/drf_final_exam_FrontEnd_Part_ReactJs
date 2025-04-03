@@ -91,59 +91,84 @@ const Navbar = () => {
           {isOpen ? <X size={28} /> : <Menu size={28} />}
         </button>
 
-        {/* ✅ Navbar Items */}
         <ul
           className={`lg:flex lg:space-x-6 ${
             isOpen
-              ? "absolute top-full left-1/2 transform -translate-x-1/2 w-full bg-white shadow-lg flex flex-col items-center text-center space-y-4 py-4 px-6"
+              ? "fixed top-0 right-0 h-full w-64 bg-white shadow-2xl flex flex-col items-start text-left space-y-4 py-4 px-6 transition-transform duration-300 ease-in-out"
               : "hidden lg:flex"
           }`}
         >
+          {isOpen && (
+            <button 
+              className="absolute top-4 right-4 lg:hidden" 
+              onClick={() => setIsOpen(false)}
+            >
+              <X size={24} />
+            </button>
+          )}
+
           {isLoggedIn ? (
             <>
-              <li>
-                <Link to={"/auth_home"} className="hover:text-primary block">
+              <li className="w-full">
+                <Link 
+                  to={"/auth_home"} 
+                  className="hover:text-primary whitespace-nowrap block py-2"
+                  onClick={() => setIsOpen(false)}
+                >
                   <b>Auth Home</b>
                 </Link>
               </li>
-              <li>
+              <li className="w-full">
                 <Link
                   to={`/profile/${userName}`}
-                  className="hover:text-primary block"
+                  className="hover:text-primary block py-2"
+                  onClick={() => setIsOpen(false)}
                 >
                   <b>Profile</b>
                 </Link>
               </li>
-              <li>
+              <li className="w-full whitespace-nowrap">
                 <Link
                   to={"/order_history"}
-                  className="hover:text-primary block"
+                  className="hover:text-primary block py-2"
+                  onClick={() => setIsOpen(false)}
                 >
                   <b>Order History</b>
                 </Link>
               </li>
-              <li>
-                <Link to={"/cart"} className="hover:text-primary block">
-                  <ShoppingCart />
+              <li className="w-full">
+                <Link 
+                  to={"/cart"} 
+                  className="hover:text-primary block py-2 items-center"
+                  onClick={() => setIsOpen(false)}
+                >
+                  <ShoppingCart className="mr-2" />
                 </Link>
               </li>
 
-              {/* ✅ Admin Dropdown */}
               {isAdmin && (
-                <li className="relative">
+                <li className="relative w-full">
                   <button
                     onClick={() => setShowAdminDropdown(!showAdminDropdown)}
-                    className="items-center flex gap-2"
+                    className="items-center flex gap-2 py-2"
                   >
-                    <b>Admin</b> <ChevronDown size={20} />
+                    <b>Admin</b> 
+                    <ChevronDown 
+                      size={20} 
+                      className={`transition-transform ${showAdminDropdown ? 'rotate-180' : ''}`}
+                    />
                   </button>
 
                   {showAdminDropdown && (
-                    <ul className="absolute left-0 mt-2 shadow-2xl bg-white rounded-md w-56 z-50">
+                    <ul className="lg:absolute lg:left-0 lg:mt-2 shadow-2xl bg-white rounded-md w-full lg:w-56 z-50">
                       <li>
                         <Link
                           to={"/add_flower"}
                           className="block py-2 px-4 hover:bg-gray-200 rounded"
+                          onClick={() => {
+                            setIsOpen(false);
+                            setShowAdminDropdown(false);
+                          }}
                         >
                           Add Flower
                         </Link>
@@ -152,6 +177,10 @@ const Navbar = () => {
                         <Link
                           to={"/order_history_admin"}
                           className="block py-2 px-4 hover:bg-gray-200 rounded"
+                          onClick={() => {
+                            setIsOpen(false);
+                            setShowAdminDropdown(false);
+                          }}
                         >
                           Order History
                         </Link>
@@ -160,6 +189,10 @@ const Navbar = () => {
                         <Link
                           to={"/admin_flower_show"}
                           className="block py-2 px-4 whitespace-nowrap hover:bg-gray-200 rounded"
+                          onClick={() => {
+                            setIsOpen(false);
+                            setShowAdminDropdown(false);
+                          }}
                         >
                           Flower Show And Edit
                         </Link>
@@ -168,6 +201,10 @@ const Navbar = () => {
                         <Link
                           to={"/user"}
                           className="block py-2 px-4 hover:bg-gray-200 rounded"
+                          onClick={() => {
+                            setIsOpen(false);
+                            setShowAdminDropdown(false);
+                          }}
                         >
                           Users Show
                         </Link>
@@ -177,35 +214,53 @@ const Navbar = () => {
                 </li>
               )}
 
-              <li>
+              <li className="w-full">
                 <button
-                  onClick={() => logoutModalRef.current.showModal()}
-                  className="hover:text-primary cursor-pointer block"
+                  onClick={() => {
+                    setIsOpen(false);
+                    logoutModalRef.current.showModal();
+                  }}
+                  className="hover:text-primary cursor-pointer block py-2 text-left w-full"
                 >
-                  {" "}
                   <b>Logout</b>
                 </button>
               </li>
             </>
           ) : (
             <>
-              <li>
-                <Link to={"/"} className="hover:text-primary block">
+              <li className="w-full">
+                <Link 
+                  to={"/"} 
+                  className="hover:text-primary block py-2"
+                  onClick={() => setIsOpen(false)}
+                >
                   <b>Home</b>
                 </Link>
               </li>
-              <li>
-                <Link to={"/register"} className="hover:text-primary block">
+              <li className="w-full">
+                <Link 
+                  to={"/register"} 
+                  className="hover:text-primary block py-2"
+                  onClick={() => setIsOpen(false)}
+                >
                   <b>Register</b>
                 </Link>
               </li>
-              <li>
-                <Link to={"/contact"} className="hover:text-primary block">
+              <li className="w-full">
+                <Link 
+                  to={"/contact"} 
+                  className="hover:text-primary block py-2"
+                  onClick={() => setIsOpen(false)}
+                >
                   <b>Contact</b>
                 </Link>
               </li>
-              <li>
-                <Link to={"/login"} className="hover:text-primary block">
+              <li className="w-full">
+                <Link 
+                  to={"/login"} 
+                  className="hover:text-primary block py-2"
+                  onClick={() => setIsOpen(false)}
+                >
                   <b>Login</b>
                 </Link>
               </li>
@@ -213,8 +268,7 @@ const Navbar = () => {
           )}
         </ul>
       </div>
-
-      {/* ✅ DaisyUI Logout Modal */}
+      
       <dialog ref={logoutModalRef} className="modal">
         <div className="modal-box text-black">
           <h2 className="font-bold text-lg">Confirm Logout</h2>
