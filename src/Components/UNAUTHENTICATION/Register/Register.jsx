@@ -131,11 +131,11 @@ const Register = () => {
             />
           </div>
           <div className="w-full md:w-1/2 p-6 bg-white rounded-xl shadow-lg">
-            {/* <Link className="btn btn-info w-full" to={"/hr_login"}>
+            <Link className="btn btn-info w-full" to={"/hr_login"}>
               HR LOGIN
             </Link>
             <br />
-            <br /> */}
+            <br />
             <form onSubmit={handleRegister} className="space-y-4">
               <input
                 type="text"
