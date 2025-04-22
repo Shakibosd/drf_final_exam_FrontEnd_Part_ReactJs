@@ -59,8 +59,8 @@ const Footer = () => {
                 <p>
                     Copyright © {new Date().getFullYear()} - Develop With By{" "}
                     <b>
-                        <a href="https://nazmus-shakib.netlify.app/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline text-sm md:text-base">
-                            Nazmus Shakib
+                        <a href="https://najmusshakib.netlify.app/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline text-sm md:text-base">
+                            Najmus Shakib
                         </a>
                     </b>
                 </p>
