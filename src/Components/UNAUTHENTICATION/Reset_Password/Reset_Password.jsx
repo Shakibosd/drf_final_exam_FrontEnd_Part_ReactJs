@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { toast } from "react-hot-toast";
 import { useNavigate, useParams } from "react-router-dom";
+import { baseUrl } from "../../../constants/env.constants";
 
 const Reset_Password = () => {
   const { uid64, token } = useParams();
@@ -26,7 +27,7 @@ const Reset_Password = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        `https://flower-sell.netlify.app/reset_password/${uid64}/${token}/`,
+        `${baseUrl}/pass_change/reset_password/${uid64}/${token}/`,
         {
           method: "POST",
           headers: {
