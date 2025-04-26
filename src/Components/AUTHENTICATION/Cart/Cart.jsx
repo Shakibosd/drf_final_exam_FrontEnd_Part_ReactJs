@@ -58,7 +58,7 @@ const Cart = () => {
     },
     onSuccess: () => {
       toast.success("Removed from cart!");
-      queryClient.invalidateQueries(["cart"]); // Invalidate and refetch cart data
+      queryClient.invalidateQueries(["cart"]);
     },
     onError: (error) => {
       console.error("Error removing from cart:", error);
@@ -72,14 +72,12 @@ const Cart = () => {
     document.getElementById("confirmDeleteModal").showModal();
   };
 
-  // Handle remove from cart
   const handleRemoveFromCart = async () => {
     if (!deleteItemId) return;
     removeFromCartMutation.mutate(deleteItemId);
     document.getElementById("confirmDeleteModal").close();
   };
 
-  // Toggle description visibility
   const toggleDescription = (id) => {
     setShowFullDescription((prevState) => ({
       ...prevState,

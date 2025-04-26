@@ -22,8 +22,8 @@ import Password_Reset from "./Components/UNAUTHENTICATION/Password_Reset/Passwor
 import Register from "./Components/UNAUTHENTICATION/Register/Register";
 import Reset_Password from "./Components/UNAUTHENTICATION/Reset_Password/Reset_Password";
 import OTP from "./Components/UNAUTHENTICATION/OTP/OTP";
+import VisitorCounter from "./Components/ADMIN/Admin/VisitorCounter";
 
-// ✅ QueryClient তৈরি করো
 const queryClient = new QueryClient();
 
 const App = () => {
@@ -56,6 +56,7 @@ const App = () => {
             <Route path='/user' element={<User />}></Route>
             <Route path='/order_history_admin' element={<Order_History_Admin />}></Route>
             <Route path='/admin_flower_show' element={<Admin_Flower_Show />}></Route>
+            <Route path='/visitor-counter' element={<VisitorCounter />}></Route>
           </Routes>
           <Footer />
         </BrowserRouter>

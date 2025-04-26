@@ -3,7 +3,7 @@ html {
 }
 
 body {
-    font-family: 'Georgia', serif;
-    background-color: #e0e0e0;
-    color: #333333;
+    font-family: 'Georgia', serif !important;
+    background-color: whitesmoke !important;
+    color: #111 !important;
 }
