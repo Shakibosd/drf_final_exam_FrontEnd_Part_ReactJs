@@ -33,9 +33,7 @@ const User = () => {
   if (error) {
     return (
       <div className="text-center pt-28">
-        <p className="text-red-500">
-          Error loading users: {error.message}
-        </p>
+        <p className="text-red-500">Error loading users: {error.message}</p>
       </div>
     );
   }

@@ -81,7 +81,7 @@ const Password_Reset = () => {
                 </label>
                 <input
                   type="email"
-                  className="input input-bordered w-full"
+                  className="input focus:ring-blue-400 bg-gray-200 w-full"
                   placeholder="Please Enter Your Email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}

@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { toast } from "react-hot-toast";
 import { useNavigate, useParams } from "react-router-dom";
-import { baseUrl } from "../../../constants/env.constants";
 
 const Reset_Password = () => {
   const { uid64, token } = useParams();
@@ -27,7 +26,7 @@ const Reset_Password = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        `${baseUrl}/pass_change/reset_password/${uid64}/${token}/`,
+        `https://flower-sell.netlify.app/pass_change/reset_password/${uid64}/${token}/`,
         {
           method: "POST",
           headers: {
@@ -92,29 +91,27 @@ const Reset_Password = () => {
             )}
 
             <form className="space-y-4" onSubmit={handleSubmit}>
-              {/* New Password */}
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
-                  className="input input-bordered w-full"
+                  className="input focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-200 w-full"
                   placeholder="New Password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   required
                 />
                 <span
-                  className="absolute right-3 top-3 cursor-pointer text-gray-500"
+                  className="absolute right-3 top-3 cursor-pointer text-gray-500 z-10"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? "🙈" : "👁️"}
                 </span>
               </div>
 
-              {/* Confirm Password */}
               <div className="relative">
                 <input
                   type={showConfirmPassword ? "text" : "password"}
-                  className="input input-bordered w-full"
+                  className="w-full p-2 bg-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-0 pr-10"
                   placeholder="Confirm Password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}

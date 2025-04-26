@@ -48,7 +48,7 @@ const OTP = () => {
       setLoading(false);
       if (response.ok) {
         toast.success("OTP Verified Successfully!");
-        navigate('/login');
+        navigate("/login");
       } else {
         toast.error(data.message || "Invalid OTP. Please try again.");
       }
@@ -101,7 +101,7 @@ const OTP = () => {
             <input
               type="email"
               id="email"
-              className="input input-bordered w-full"
+              className="input focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-200 w-full"
               placeholder="Enter Your Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -114,7 +114,7 @@ const OTP = () => {
                   <input
                     key={index}
                     type="text"
-                    className="input input-bordered w-20"
+                    className="input focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-200 w-20"
                     maxLength="1"
                     value={digit}
                     onChange={(e) => handleOtpChange(index, e.target.value)}
@@ -143,7 +143,7 @@ const OTP = () => {
             <input
               type="email"
               id="email_resend"
-              className="input input-bordered w-full"
+              className="input focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-200 w-full"
               placeholder="Enter Your Email"
               value={emailResend}
               onChange={(e) => setEmailResend(e.target.value)}

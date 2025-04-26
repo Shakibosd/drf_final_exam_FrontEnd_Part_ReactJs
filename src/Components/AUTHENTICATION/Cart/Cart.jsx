@@ -166,7 +166,9 @@ const Cart = () => {
                         onClick={() => toggleDescription(item.id)}
                         className="text-blue-400 underline"
                       >
-                        {showFullDescription[item.id] ? " See Less" : " See All"}
+                        {showFullDescription[item.id]
+                          ? " See Less"
+                          : " See All"}
                       </button>
                     </td>
                     <td className="px-2 py-3 whitespace-nowrap">
@@ -208,7 +210,9 @@ const Cart = () => {
               Yes, Remove
             </button>
             <button
-              onClick={() => document.getElementById("confirmDeleteModal").close()}
+              onClick={() =>
+                document.getElementById("confirmDeleteModal").close()
+              }
               className="btn"
             >
               Cancel

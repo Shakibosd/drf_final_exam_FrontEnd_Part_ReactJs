@@ -142,28 +142,28 @@ const Register = () => {
                 name="username"
                 placeholder="Username"
                 required
-                className="input input-bordered w-full"
+                className="input w-full bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
               />
               <input
                 type="email"
                 name="email"
                 placeholder="Email"
                 required
-                className="input input-bordered w-full"
+                className="input w-full bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
               />
               <input
                 type="text"
                 name="first_name"
                 placeholder="First Name"
                 required
-                className="input input-bordered w-full"
+                className="input w-full bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
               />
               <input
                 type="text"
                 name="last_name"
                 placeholder="Last Name"
                 required
-                className="input input-bordered w-full"
+                className="input w-full bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
               />
               <div className="relative">
                 <input
@@ -171,25 +171,26 @@ const Register = () => {
                   name="password"
                   placeholder="Password"
                   required
-                  className="input input-bordered w-full"
+                  className="input w-full bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400 pr-10"
                 />
                 <span
-                  className="absolute right-3 top-3 cursor-pointer"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer z-10 hover:text-blue-500"
                   onClick={() => togglePassword("password")}
                 >
                   {showPassword ? "👁️" : "🙈"}
                 </span>
               </div>
-              <div className="relative">
+
+              <div className="relative mt-4">
                 <input
                   type={showConfirmPassword ? "text" : "password"}
                   name="confirm_password"
                   placeholder="Confirm Password"
                   required
-                  className="input input-bordered w-full"
+                  className="input input-bordered w-full bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400 pr-10"
                 />
                 <span
-                  className="absolute right-3 top-3 cursor-pointer"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer z-10 hover:text-blue-500"
                   onClick={() => togglePassword("confirm_password")}
                 >
                   {showConfirmPassword ? "👁️" : "🙈"}
@@ -199,7 +200,7 @@ const Register = () => {
                 type="file"
                 name="profile_img"
                 required
-                className="file-input file-input-bordered w-full"
+                className="file-input file-input-bordered w-full bg-gray-200"
               />
               <button
                 type="submit"

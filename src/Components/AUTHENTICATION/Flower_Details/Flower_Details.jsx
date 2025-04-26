@@ -66,14 +66,11 @@ const Flower_Details = () => {
   // Fetch comments
   const fetchComments = async () => {
     const token = localStorage.getItem("auth_token");
-    const { data } = await axios.get(
-      `${baseUrl}/flower/comment_show/${id}/`,
-      {
-        headers: {
-          Authorization: `token ${token}`,
-        },
-      }
-    );
+    const { data } = await axios.get(`${baseUrl}/flower/comment_show/${id}/`, {
+      headers: {
+        Authorization: `token ${token}`,
+      },
+    });
     return data;
   };
 
@@ -257,7 +254,8 @@ const Flower_Details = () => {
   };
 
   if (flowerLoading) return <Loader />;
-  if (flowerError) return <p className="text-center text-red-500">Flower not found!</p>;
+  if (flowerError)
+    return <p className="text-center text-red-500">Flower not found!</p>;
 
   return (
     <div className="container mx-auto max-w-screen-xl px-6 py-3 pt-28">
@@ -267,7 +265,11 @@ const Flower_Details = () => {
       {flower && (
         <div className="bg-white shadow-md rounded-lg overflow-hidden">
           <figure>
-            <img src={flower.image} alt={flower.title} className="w-full h-72 object-cover" />
+            <img
+              src={flower.image}
+              alt={flower.title}
+              className="w-full h-72 object-cover"
+            />
           </figure>
 
           <div className="p-6">
@@ -280,7 +282,7 @@ const Flower_Details = () => {
             <p className="text-gray-600 text-lg mt-2">
               Product In Stock {" -> "} {flower.stock}
             </p>
-            <p className="text-lg font-semibold whitespace-nowrap mt-2 btn w-40">
+            <p className="text-sm font-semibold mt-2 bg-gray-200 text-gray-700 px-3 py-2 rounded-lg w-max">
               {flower.category}
             </p>
 
@@ -289,27 +291,42 @@ const Flower_Details = () => {
               <Link to={"/auth_home"} className="btn btn-primary w-full">
                 Back
               </Link>
-              <button className="btn btn-secondary w-full" onClick={() =>
-                document.getElementById("orderModal").showModal()} disabled={createOrderMutation.isPending}>
+              <button
+                className="btn btn-secondary w-full"
+                onClick={() =>
+                  document.getElementById("orderModal").showModal()
+                }
+                disabled={createOrderMutation.isPending}
+              >
                 {createOrderMutation.isPending ? "Ordering..." : "Order Now"}
               </button>
-              <button className="btn btn-accent w-full" onClick={handlePayment} disabled={!canComment}>
+              <button
+                className="btn btn-accent w-full"
+                onClick={handlePayment}
+                disabled={!canComment}
+              >
                 Payment
               </button>
-              <button className="btn btn-warning w-full" onClick={() =>
-                document.getElementById("commentSection").classList.toggle("hidden")}>
+              <button
+                className="btn btn-warning w-full"
+                onClick={() =>
+                  document
+                    .getElementById("commentSection")
+                    .classList.toggle("hidden")
+                }
+              >
                 Comment
               </button>
             </div>
 
             {/* Comment Section */}
             <div
-              id="commentSection"
+              id="commentSection" 
               className="hidden mt-4 p-4 border rounded-lg"
             >
               <h3 className="text-lg font-bold">Leave a Comment</h3>
               <textarea
-                className="textarea textarea-bordered w-full mt-2"
+                className="textarea focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-200 w-full mt-2"
                 placeholder="Your comment..."
                 onChange={(e) => setNewComment(e.target.value)}
                 value={newComment}
@@ -320,17 +337,19 @@ const Flower_Details = () => {
                 onClick={handleCommentSubmit}
                 disabled={addCommentMutation.isPending}
               >
-                {addCommentMutation.isPending ? "Submitting..." : "Submit Comment"}
+                {addCommentMutation.isPending
+                  ? "Submitting..."
+                  : "Submit Comment"}
               </button>
             </div>
 
             {/* Order Modal */}
             <dialog id="orderModal" className="modal">
-              <div className="modal-box">
+              <div className="modal-box bg-white">
                 <h3 className="text-lg font-bold">Place Your Order</h3>
                 <input
                   type="number"
-                  className="input input-bordered w-full mt-2"
+                  className="input focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-200 w-full mt-2"
                   value={quantity}
                   onChange={(e) => setQuantity(e.target.value)}
                   min="1"
@@ -422,10 +441,10 @@ const Flower_Details = () => {
 
       {/* Edit Comment Modal */}
       <dialog id="editModal" className="modal">
-        <div className="modal-box">
+        <div className="modal-box bg-white">
           <h3 className="text-lg font-bold">Edit Comment</h3>
           <textarea
-            className="textarea textarea-bordered w-full mt-2"
+            className="textarea focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-200 w-full mt-2"
             value={editCommentText}
             onChange={(e) => setEditCommentText(e.target.value)}
             disabled={editCommentMutation.isPending}

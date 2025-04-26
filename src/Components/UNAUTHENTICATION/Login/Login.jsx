@@ -92,7 +92,7 @@ const Login = () => {
                   onChange={handleChange}
                   placeholder="Enter Your Username"
                   required
-                  className="input input-bordered w-full"
+                  className="input w-full focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-200"
                 />
               </div>
 
@@ -109,10 +109,10 @@ const Login = () => {
                     onChange={handleChange}
                     placeholder="Enter Your Password"
                     required
-                    className="input input-bordered w-full"
+                    className="input w-full focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-200"
                   />
                   <span
-                    className="absolute right-3 top-3 cursor-pointer text-gray-600"
+                    className="absolute right-3 top-3 cursor-pointer z-10"
                     onClick={togglePassword}
                   >
                     {showPassword ? "👁️" : "🙈"}

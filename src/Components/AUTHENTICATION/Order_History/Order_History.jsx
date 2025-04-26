@@ -37,8 +37,8 @@ const OrderHistory = () => {
     refetch: refetchOrders,
   } = useQuery({
     queryKey: ["orders"],
-    queryFn: fetchOrders, 
-    enabled: !!token, 
+    queryFn: fetchOrders,
+    enabled: !!token,
     onError: () => {
       toast.error("❌ Network error. Try again.");
     },
@@ -54,9 +54,9 @@ const OrderHistory = () => {
     isLoading: statsLoading,
     isError: statsError,
   } = useQuery({
-    queryKey: ["stats"], 
-    queryFn: fetchStats, 
-    enabled: !!token, 
+    queryKey: ["stats"],
+    queryFn: fetchStats,
+    enabled: !!token,
     onError: () => {
       console.error("Error fetching order stats");
     },
@@ -154,12 +154,15 @@ const OrderHistory = () => {
                     <tr key={order.id} className="border-b border-gray-200">
                       <td className="p-3 whitespace-nowrap">{order.flower}</td>
                       <td className="p-3 whitespace-nowrap">{order.price} ৳</td>
-                      <td className="p-3 whitespace-nowrap">{order.quantity}</td>
+                      <td className="p-3 whitespace-nowrap">
+                        {order.quantity}
+                      </td>
                       <td
-                        className={`p-3 whitespace-nowrap font-semibold ${order.status === "Completed"
+                        className={`p-3 whitespace-nowrap font-semibold ${
+                          order.status === "Completed"
                             ? "text-green-600"
                             : "text-red-600"
-                          }`}
+                        }`}
                       >
                         {order.status}
                       </td>

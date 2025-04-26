@@ -9,7 +9,6 @@ const Profile = () => {
   const userId = localStorage.getItem("userId");
   const queryClient = useQueryClient();
 
-  // Fetch profile data
   const fetchProfile = async () => {
     if (!userId) return null;
     const response = await axios.get(`${baseUrl}/user/user_detail/${userId}/`);
@@ -33,7 +32,6 @@ const Profile = () => {
     },
   });
 
-  // Update profile mutation
   const updateProfileMutation = useMutation({
     mutationFn: async (updatedProfile) => {
       const token = localStorage.getItem("auth_token");
@@ -51,7 +49,7 @@ const Profile = () => {
     },
     onSuccess: () => {
       toast.success("Profile updated successfully!");
-      queryClient.invalidateQueries(["profile", userId]); // Invalidate and refetch profile data
+      queryClient.invalidateQueries(["profile", userId]);
     },
     onError: (error) => {
       console.error("Error updating profile:", error);
@@ -59,7 +57,6 @@ const Profile = () => {
     },
   });
 
-  // Handle file upload to Cloudinary
   const handleFileChange = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -78,7 +75,6 @@ const Profile = () => {
       if (imageUrl) {
         toast.success("Image uploaded successfully!");
 
-        // Update profile with new image URL
         const updatedProfile = {
           profile: {
             profile_img: imageUrl,
@@ -94,7 +90,6 @@ const Profile = () => {
     }
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -116,7 +111,9 @@ const Profile = () => {
   }
 
   if (isError) {
-    return <p className="text-center text-red-500">Error loading profile data.</p>;
+    return (
+      <p className="text-center text-red-500">Error loading profile data.</p>
+    );
   }
 
   if (!profile) {
@@ -141,10 +138,7 @@ const Profile = () => {
             >
               <div className="flex flex-col items-center">
                 <img
-                  src={
-                    profile.profile_img ||
-                    "https://via.placeholder.com/150"
-                  }
+                  src={profile.profile_img}
                   alt="Profile"
                   className="w-52 h-52 rounded-full object-cover border-4 border-white shadow-lg"
                 />
@@ -167,7 +161,7 @@ const Profile = () => {
                 <label className="label font-semibold">Username</label>
                 <input
                   type="text"
-                  className="input input-bordered w-full"
+                  className="input focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-200 w-full"
                   name="username"
                   value={profile.username}
                   onChange={(e) =>
@@ -181,7 +175,7 @@ const Profile = () => {
                   <label className="label font-semibold">First Name</label>
                   <input
                     type="text"
-                    className="input input-bordered w-full"
+                    className="input focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-200 w-full"
                     name="first_name"
                     value={profile.first_name}
                     onChange={(e) =>
@@ -194,7 +188,7 @@ const Profile = () => {
                   <label className="label font-semibold">Last Name</label>
                   <input
                     type="text"
-                    className="input input-bordered w-full"
+                    className="input focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-200 w-full"
                     name="last_name"
                     value={profile.last_name}
                     onChange={(e) =>
@@ -208,7 +202,7 @@ const Profile = () => {
                 <label className="label font-semibold">Email</label>
                 <input
                   type="email"
-                  className="input input-bordered w-full"
+                  className="input focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-200 w-full"
                   name="email"
                   value={profile.email}
                   onChange={(e) =>

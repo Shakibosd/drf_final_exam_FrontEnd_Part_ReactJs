@@ -131,7 +131,9 @@ const Admin_Flower_Show = () => {
 
       {/* Edit Form */}
       <div className="bg-white shadow-lg rounded-lg p-6 mb-8">
-        <h2 className="text-2xl font-bold mb-4 text-center">Edit Flower Post</h2>
+        <h2 className="text-2xl font-bold mb-4 text-center">
+          Edit Flower Post
+        </h2>
         {editPost && (
           <form
             onSubmit={handleUpdate}
@@ -139,66 +141,76 @@ const Admin_Flower_Show = () => {
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-gray-700 font-semibold">Title:</label>
+                <label className="block text-gray-700 font-semibold">
+                  Title:
+                </label>
                 <input
                   type="text"
                   value={editPost.title}
                   onChange={(e) =>
                     setEditPost({ ...editPost, title: e.target.value })
                   }
-                  className="border p-2 w-full rounded-md"
+                  className="border p-2 w-full rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-200"
                   required
                 />
               </div>
               <div>
-                <label className="block text-gray-700 font-semibold">Category:</label>
+                <label className="block text-gray-700 font-semibold">
+                  Category:
+                </label>
                 <input
                   type="text"
                   value={editPost.category}
                   onChange={(e) =>
                     setEditPost({ ...editPost, category: e.target.value })
                   }
-                  className="border p-2 w-full rounded-md"
+                  className="border p-2 w-full rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-200"
                   required
                 />
               </div>
             </div>
 
             <div className="mt-4">
-              <label className="block text-gray-700 font-semibold">Description:</label>
+              <label className="block text-gray-700 font-semibold">
+                Description:
+              </label>
               <textarea
                 value={editPost.description}
                 onChange={(e) =>
                   setEditPost({ ...editPost, description: e.target.value })
                 }
-                className="border p-2 w-full rounded-md"
+                className="border p-2 w-full rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-200"
                 required
               ></textarea>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
               <div>
-                <label className="block text-gray-700 font-semibold">Price:</label>
+                <label className="block text-gray-700 font-semibold">
+                  Price:
+                </label>
                 <input
                   type="number"
                   value={editPost.price}
                   onChange={(e) =>
                     setEditPost({ ...editPost, price: e.target.value })
                   }
-                  className="border p-2 w-full rounded-md"
+                  className="border p-2 w-full rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-200"
                   required
                   min="0"
                 />
               </div>
               <div>
-                <label className="block text-gray-700 font-semibold">Stock:</label>
+                <label className="block text-gray-700 font-semibold">
+                  Stock:
+                </label>
                 <input
                   type="number"
                   value={editPost.stock}
                   onChange={(e) =>
                     setEditPost({ ...editPost, stock: e.target.value })
                   }
-                  className="border p-2 w-full rounded-md"
+                  className="border p-2 w-full rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-200"
                   required
                   min="0"
                 />
@@ -206,7 +218,9 @@ const Admin_Flower_Show = () => {
             </div>
 
             <div className="mt-4">
-              <label className="block text-gray-700 font-semibold">Image:</label>
+              <label className="block text-gray-700 font-semibold">
+                Image:
+              </label>
               <input
                 type="file"
                 onChange={(e) =>

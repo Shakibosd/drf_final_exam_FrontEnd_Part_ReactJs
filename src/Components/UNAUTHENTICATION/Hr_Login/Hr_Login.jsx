@@ -95,7 +95,7 @@ const Hr_Login = () => {
                   onChange={handleChange}
                   placeholder="Enter Your Username"
                   required
-                  className="input input-bordered w-full"
+                  className="input focus:ring-blue-400 bg-gray-200 w-full"
                 />
               </div>
 
@@ -112,7 +112,7 @@ const Hr_Login = () => {
                     onChange={handleChange}
                     placeholder="Enter Your Password"
                     required
-                    className="input input-bordered w-full"
+                    className="input focus:ring-blue-400 bg-gray-200 w-full"
                   />
                 </div>
               </div>

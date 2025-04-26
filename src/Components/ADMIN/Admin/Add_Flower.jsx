@@ -105,7 +105,7 @@ const Add_Flower = () => {
                   type="text"
                   id="title"
                   name="title"
-                  className="mt-1 block w-full px-4 py-2 input input-bordered"
+                  className="mt-1 block w-full px-4 py-2 input focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-200"
                   placeholder="Flower Name"
                   required
                 />
@@ -122,7 +122,7 @@ const Add_Flower = () => {
                 <textarea
                   id="description"
                   name="description"
-                  className="mt-1 block w-full px-4 py-2 input input-bordered"
+                  className="mt-1 block w-full px-4 py-2 input focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-200"
                   placeholder="Flower Description"
                   rows="4"
                   required
@@ -141,7 +141,7 @@ const Add_Flower = () => {
                   type="number"
                   id="price"
                   name="price"
-                  className="mt-1 block w-full px-4 py-2 input input-bordered"
+                  className="mt-1 block w-full px-4 py-2 input focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-200"
                   placeholder="Flower Price"
                   required
                 />
@@ -159,7 +159,7 @@ const Add_Flower = () => {
                   type="file"
                   id="imageInput"
                   name="imageInput"
-                  className="mt-1 block w-full px-4 py-2 input input-bordered"
+                  className="mt-1 block w-full px-4 py-2 input focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-200"
                   required
                 />
               </div>
@@ -176,7 +176,7 @@ const Add_Flower = () => {
                   type="text"
                   id="category"
                   name="category"
-                  className="mt-1 block w-full px-4 py-2 input input-bordered"
+                  className="mt-1 block w-full px-4 py-2 input focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-200"
                   placeholder="Flower Category"
                   required
                 />
@@ -194,7 +194,7 @@ const Add_Flower = () => {
                   type="number"
                   id="stock"
                   name="stock"
-                  className="mt-1 block w-full px-4 py-2 input input-bordered"
+                  className="mt-1 block w-full px-4 py-2 input focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-200"
                   placeholder="Flower Stock"
                   required
                 />

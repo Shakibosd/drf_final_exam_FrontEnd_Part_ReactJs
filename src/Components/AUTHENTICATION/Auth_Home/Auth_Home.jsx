@@ -251,7 +251,7 @@ const Auth_Home = () => {
             {seasonal_flowers.map((seasonal_flowers) => (
               <div
                 key={seasonal_flowers.id}
-                className="card card-compact bg-base-100 shadow-xl rounded-md"
+                className="card card-compact bg-white shadow-xl rounded-md"
               >
                 <figure>
                   <img
@@ -278,7 +278,7 @@ const Auth_Home = () => {
             {floral_arrangement_ideas.map((floral_arrangement_ideas) => (
               <div
                 key={floral_arrangement_ideas.id}
-                className="card card-compact bg-base-100 shadow-xl rounded-md"
+                className="card card-compact bg-white shadow-xl rounded-md"
               >
                 <figure>
                   <img
@@ -451,7 +451,7 @@ const Auth_Home = () => {
                       <p className="text-xl font-semibold mt-2 text-blue-600">
                         ৳{flower.price}
                       </p>
-                      <p className="text-sm font-semibold mt-2 bg-gray-200 text-gray-700 px-3 py-1 rounded-lg w-max">
+                      <p className="text-sm font-semibold mt-2 bg-gray-200 text-gray-700 px-3 py-2 rounded-lg w-max">
                         {flower.category}
                       </p>
                       <div className="flex gap-3 mt-5">

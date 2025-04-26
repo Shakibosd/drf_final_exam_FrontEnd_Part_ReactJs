@@ -81,7 +81,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-base-100 shadow-md fixed top-0 left-0 w-full z-50">
+    <nav className="bg-white shadow-md fixed top-0 left-0 w-full z-50">
       <div className="max-w-screen-xl mx-auto px-6 py-3 flex items-center justify-between">
         <Link to={"/"}>
           <h1 className="text-4xl text-teal-500">Flower Seal</h1>
@@ -99,8 +99,8 @@ const Navbar = () => {
           }`}
         >
           {isOpen && (
-            <button 
-              className="absolute top-4 right-4 lg:hidden" 
+            <button
+              className="absolute top-4 right-4 lg:hidden"
               onClick={() => setIsOpen(false)}
             >
               <X size={24} />
@@ -110,8 +110,8 @@ const Navbar = () => {
           {isLoggedIn ? (
             <>
               <li className="w-full">
-                <Link 
-                  to={"/auth_home"} 
+                <Link
+                  to={"/auth_home"}
                   className="hover:text-primary whitespace-nowrap block py-2"
                   onClick={() => setIsOpen(false)}
                 >
@@ -137,8 +137,8 @@ const Navbar = () => {
                 </Link>
               </li>
               <li className="w-full">
-                <Link 
-                  to={"/cart"} 
+                <Link
+                  to={"/cart"}
                   className="hover:text-primary block py-2 items-center"
                   onClick={() => setIsOpen(false)}
                 >
@@ -152,10 +152,12 @@ const Navbar = () => {
                     onClick={() => setShowAdminDropdown(!showAdminDropdown)}
                     className="items-center flex gap-2 py-2"
                   >
-                    <b>Admin</b> 
-                    <ChevronDown 
-                      size={20} 
-                      className={`transition-transform ${showAdminDropdown ? 'rotate-180' : ''}`}
+                    <b>Admin</b>
+                    <ChevronDown
+                      size={20}
+                      className={`transition-transform ${
+                        showAdminDropdown ? "rotate-180" : ""
+                      }`}
                     />
                   </button>
 
@@ -229,8 +231,8 @@ const Navbar = () => {
           ) : (
             <>
               <li className="w-full">
-                <Link 
-                  to={"/"} 
+                <Link
+                  to={"/"}
                   className="hover:text-primary block py-2"
                   onClick={() => setIsOpen(false)}
                 >
@@ -238,8 +240,8 @@ const Navbar = () => {
                 </Link>
               </li>
               <li className="w-full">
-                <Link 
-                  to={"/register"} 
+                <Link
+                  to={"/register"}
                   className="hover:text-primary block py-2"
                   onClick={() => setIsOpen(false)}
                 >
@@ -247,8 +249,8 @@ const Navbar = () => {
                 </Link>
               </li>
               <li className="w-full">
-                <Link 
-                  to={"/contact"} 
+                <Link
+                  to={"/contact"}
                   className="hover:text-primary block py-2"
                   onClick={() => setIsOpen(false)}
                 >
@@ -256,8 +258,8 @@ const Navbar = () => {
                 </Link>
               </li>
               <li className="w-full">
-                <Link 
-                  to={"/login"} 
+                <Link
+                  to={"/login"}
                   className="hover:text-primary block py-2"
                   onClick={() => setIsOpen(false)}
                 >
@@ -268,9 +270,9 @@ const Navbar = () => {
           )}
         </ul>
       </div>
-      
+
       <dialog ref={logoutModalRef} className="modal">
-        <div className="modal-box text-black">
+        <div className="modal-box text-black bg-white">
           <h2 className="font-bold text-lg">Confirm Logout</h2>
           <p className="py-4">Are you sure you want to log out?</p>
           <div className="modal-action">

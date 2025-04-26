@@ -15,7 +15,6 @@ const fetchFlowers = async () => {
 };
 
 const Home = () => {
-  // Slide Section Data
   const slides = [
     {
       id: "slide1",
@@ -139,7 +138,7 @@ const Home = () => {
             {seasonal_flowers.map((seasonal_flowers) => (
               <div
                 key={seasonal_flowers.id}
-                className="card card-compact bg-base-100 shadow-xl rounded-md"
+                className="card card-compact bg-base-600 shadow-xl rounded-md"
               >
                 <figure>
                   <img
@@ -165,7 +164,7 @@ const Home = () => {
             {floral_arrangement_ideas.map((floral_arrangement_ideas) => (
               <div
                 key={floral_arrangement_ideas.id}
-                className="card card-compact bg-base-100 shadow-xl rounded-md"
+                className="card card-compact bg-base-600 shadow-xl rounded-md"
               >
                 <figure>
                   <img
@@ -214,7 +213,7 @@ const Home = () => {
                       <b>৳</b>
                       {flower.price}
                     </p>
-                    <p className="text-lg font-semibold mt-2 btn w-40 whitespace-nowrap">
+                    <p className="text-lg mt-2 btn btn-primary w-40 whitespace-nowrap">
                       {flower.category}
                     </p>
                   </div>
