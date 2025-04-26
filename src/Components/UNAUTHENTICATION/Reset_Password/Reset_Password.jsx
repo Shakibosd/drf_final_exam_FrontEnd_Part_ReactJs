@@ -26,7 +26,7 @@ const Reset_Password = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        `https://flower-sell.netlify.app/pass_change/reset_password/${uid64}/${token}/`,
+        `https://flower-sell.netlify.app/reset_password/${uid64}/${token}/`,
         {
           method: "POST",
           headers: {
